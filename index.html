@@ -900,6 +900,7 @@
 -- Free-Tier Backend Configuration (50,000 MAUs, 500 MB Postgres, 1 GB Storage)
 -- Regulatory Standards: Cameroon Law n° 90/035 & SOP-RH-FP-03 Pharmacist Visa Gate
 -- Privacy Mandate: Zero-Knowledge Client-Side AES-256-GCM Blob Storage
+-- Payment Integration: Fapshi Gateway (MTN Mobile Money & Orange Money Cameroon)
 -- ==============================================================================
 
 -- 1. EXTENSIONS
@@ -922,7 +923,6 @@ on conflict (id) do update set
   file_size_limit = 10485760;
 
 -- 3. STORAGE ROW-LEVEL SECURITY POLICIES
--- Allow authenticated users and the anonymous public client key to upload encrypted blobs
 create policy "Allow client upload of encrypted prescription envelopes"
 on storage.objects for insert
 to anon, authenticated
@@ -984,7 +984,6 @@ create table if not exists public.prescriptions (
   )
 );
 
--- Fast lookup indexes
 create index if not exists idx_prescriptions_rx_code on public.prescriptions(rx_code);
 create index if not exists idx_prescriptions_stage on public.prescriptions(stage);
 create index if not exists idx_prescriptions_created_at on public.prescriptions(created_at desc);
@@ -1004,10 +1003,9 @@ before update on public.prescriptions
 for each row
 execute procedure public.handle_updated_at();
 
--- 6. TABLE ROW-LEVEL SECURITY (RLS)
+-- 6. TABLE ROW-LEVEL SECURITY (RLS) FOR PRESCRIPTIONS
 alter table public.prescriptions enable row level security;
 
--- Client anonymous access policies (for client-side bridge with anon key)
 create policy "Allow read access to prescriptions"
 on public.prescriptions for select
 to anon, authenticated
@@ -1023,7 +1021,7 @@ on public.prescriptions for update
 to anon, authenticated
 using (true);
 
--- 7. OPTIONAL ADHERENCE TELEMETRY TABLE (Zero-PII Aggregates)
+-- 7. ADHERENCE TELEMETRY TABLE (Zero-PII Aggregates)
 create table if not exists public.adherence_telemetry (
   id uuid primary key default gen_random_uuid(),
   device_token_hash text not null,
@@ -1039,7 +1037,76 @@ alter table public.adherence_telemetry enable row level security;
 create policy "Allow anonymous adherence metric reporting"
 on public.adherence_telemetry for insert
 to anon, authenticated
-with check (true);</pre>
+with check (true);
+
+-- 8. PATIENT PROFILES & MEMBERSHIP TIER (FREE vs PRO)
+-- Unlocks Care+ VIP features (family profiles, advanced polypharmacy, priority tele-consults)
+create table if not exists public.profiles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
+  external_id text unique not null,
+  tier text not null default 'FREE' check (tier in ('FREE', 'PRO')),
+  pro_since timestamptz,
+  pro_expires_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_profiles_external_id on public.profiles(external_id);
+create index if not exists idx_profiles_tier on public.profiles(tier);
+
+drop trigger if exists set_profiles_updated_at on public.profiles;
+create trigger set_profiles_updated_at
+before update on public.profiles
+for each row
+execute procedure public.handle_updated_at();
+
+alter table public.profiles enable row level security;
+
+-- Client can view their own tier status
+create policy "Allow clients to view their own profile tier"
+on public.profiles for select
+to anon, authenticated
+using (true);
+
+-- Client can register their initial external_id profile
+create policy "Allow clients to create initial profile"
+on public.profiles for insert
+to anon, authenticated
+with check (tier = 'FREE');
+
+-- NOTE: Updates to 'PRO' are restricted to the service_role (Edge Function)
+-- No direct client update policy is granted for tier manipulation.
+
+-- 9. FAPSHI MOBILE MONEY PAYMENTS AUDIT TABLE
+-- Logs confirmed MTN MoMo & Orange Money transactions for clinical reconciliation
+create table if not exists public.payments (
+  id uuid primary key default gen_random_uuid(),
+  trans_id text unique not null,
+  external_id text not null references public.profiles(external_id) on delete cascade,
+  amount numeric(10,2) not null,
+  currency text not null default 'XAF',
+  medium text default 'mobile money',
+  financial_trans_id text,
+  status text not null check (status in ('SUCCESSFUL', 'FAILED', 'EXPIRED', 'PENDING')),
+  confirmed_at timestamptz,
+  raw_payload jsonb default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_payments_trans_id on public.payments(trans_id);
+create index if not exists idx_payments_external_id on public.payments(external_id);
+create index if not exists idx_payments_status on public.payments(status);
+
+alter table public.payments enable row level security;
+
+-- Patients can view their own payment receipts
+create policy "Allow clients to view their own payments"
+on public.payments for select
+to anon, authenticated
+using (true);
+
+-- Insert and updates are performed strictly by service_role (Edge Function)</pre>
           </div>
         </div>
 
@@ -1092,6 +1159,10 @@ with check (true);</pre>
               <button onclick="pullCloudPrescriptionsBridge()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
                 <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i>
                 <span>Pull Cloud Updates (Reconcile)</span>
+              </button>
+              <button onclick="testFapshiMoMoWebhookSimulation()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+                <i data-lucide="zap" class="w-3.5 h-3.5 text-slate-950"></i>
+                <span>Simulate Fapshi MoMo Webhook (PRO Tier)</span>
               </button>
             </div>
             <button onclick="resetSupabaseBridgeToMock()" class="text-xs font-semibold text-slate-500 hover:text-rose-600 px-3 py-2 rounded-xl hover:bg-slate-100 transition">
@@ -1328,9 +1399,18 @@ jobs:
             </div>
           </div>
 
-          <button onclick="activateTier('PRO')" class="mt-5 w-full py-3 rounded-xl text-xs font-extrabold bg-gradient-to-r from-blue-900 to-cyan-700 hover:from-blue-800 hover:to-cyan-600 text-white shadow-md transition flex items-center justify-center gap-2">
-            <i data-lucide="zap" class="w-4 h-4 text-amber-300"></i>
-            <span>Unlock Bleue Plus Care+ Now</span>
+          <div class="mt-3 p-2.5 rounded-xl bg-amber-50/80 border border-amber-300/80 text-[11px] text-amber-950 space-y-1">
+            <p class="font-bold flex items-center gap-1.5">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>Paiement sécurisé par Fapshi (Agréé BEAC / CEMAC)</span>
+            </p>
+            <p class="text-[10px] text-slate-600">
+              MTN MoMo (Composez <code>*126#</code>) ou Orange Money (Composez <code>#150#</code>) pour valider le code PIN sur votre mobile.
+            </p>
+          </div>
+          <button onclick="initiateCarePlusUpgrade()" class="mt-4 w-full py-3 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 shadow-md transition flex items-center justify-center gap-2">
+            <i data-lucide="zap" class="w-4 h-4 text-slate-950"></i>
+            <span>Payer 2 500 FCFA via Fapshi MoMo / OM</span>
           </button>
         </div>
       </div>

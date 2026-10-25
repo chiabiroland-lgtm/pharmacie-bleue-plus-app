@@ -536,12 +536,92 @@
     return () => {};
   }
 
+  /**
+   * Patient Tier & Fapshi Payment Bridge Methods
+   */
+  function getPatientExternalId() {
+    let extId = localStorage.getItem('pbp_patient_external_id');
+    if (!extId) {
+      extId = 'pbp_patient_' + Math.random().toString(36).substring(2, 10);
+      try {
+        localStorage.setItem('pbp_patient_external_id', extId);
+      } catch (_) {}
+    }
+    return extId;
+  }
+
+  async function fetchPatientTier(externalId = getPatientExternalId()) {
+    updateMode();
+    if (!isLiveConfigured() || !navigator.onLine) {
+      const localTier = localStorage.getItem('pbp_tier') || 'FREE';
+      return { tier: localTier, mode: 'LOCAL_MOCK_VAULT', externalId };
+    }
+
+    const baseUrl = config.url.replace(/\/+$/, '');
+    const url = `${baseUrl}/rest/v1/profiles?external_id=eq.${encodeURIComponent(externalId)}&select=tier,pro_since,pro_expires_at`;
+
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'apikey': config.anonKey,
+          'Authorization': `Bearer ${config.anonKey}`
+        }
+      });
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows && rows.length > 0) {
+          const profile = rows[0];
+          // Check expiration
+          let currentTier = profile.tier || 'FREE';
+          if (profile.pro_expires_at && new Date(profile.pro_expires_at) < new Date()) {
+            currentTier = 'FREE';
+          }
+          try {
+            localStorage.setItem('pbp_tier', currentTier);
+          } catch (_) {}
+          log(`[TIER SYNC] Live tier for ${externalId}: ${currentTier}`, 'INFO');
+          return { tier: currentTier, expiresAt: profile.pro_expires_at, mode: config.mode, externalId };
+        }
+      }
+    } catch (err) {
+      log(`[TIER SYNC FALLBACK] Could not reach cloud (${err && err.message ? err.message : 'offline'}). Using local tier.`, 'WARN');
+    }
+    const localTier = localStorage.getItem('pbp_tier') || 'FREE';
+    return { tier: localTier, mode: 'LOCAL_MOCK_VAULT', externalId };
+  }
+
+  async function simulateFapshiWebhook(options = {}) {
+    const externalId = options.externalId || getPatientExternalId();
+    const transId = options.transId || ('FAP-' + Date.now().toString(36).toUpperCase());
+    const amount = options.amount || 2500;
+    const medium = options.medium || 'MTN MoMo';
+    const status = options.status || 'SUCCESSFUL';
+
+    log(`[FAPSHI SIMULATION] Simulating webhook: transId=${transId}, status=${status}, amount=${amount} FCFA, medium=${medium}`, 'INFO');
+
+    if (status === 'SUCCESSFUL') {
+      try {
+        localStorage.setItem('pbp_tier', 'PRO');
+      } catch (_) {}
+      if (typeof window.activateTier === 'function') {
+        window.activateTier('PRO');
+      }
+      log(`[TIER UPGRADE] Fapshi confirmed ${amount} FCFA via ${medium}! Patient tier flipped to PRO (Care+ VIP Active).`, 'SUCCESS');
+      return { success: true, tier: 'PRO', transId, status: 'SUCCESSFUL' };
+    } else {
+      log(`[PAYMENT NOTICE] Fapshi transaction ${transId} ended with status: ${status}.`, 'WARN');
+      return { success: false, tier: 'FREE', transId, status };
+    }
+  }
+
   // Network event listeners for automatic auto-sync on reconnect
   window.addEventListener('online', () => {
     log('[NETWORK] Connection restored. Synchronizing pending outbox with Supabase Bridge...', 'INFO');
     updateMode();
     notifyStatusChange();
     syncOutbox({ silent: true });
+    fetchPatientTier();
   });
 
   window.addEventListener('offline', () => {
@@ -564,6 +644,9 @@
     pushPrescription,
     syncOutbox,
     pullCloudUpdates,
+    getPatientExternalId,
+    fetchPatientTier,
+    simulateFapshiWebhook,
     validatePayloadPiiSafety,
     subscribeLogs,
     subscribeStatus,

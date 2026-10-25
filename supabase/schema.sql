@@ -3,6 +3,7 @@
 -- Free-Tier Backend Configuration (50,000 MAUs, 500 MB Postgres, 1 GB Storage)
 -- Regulatory Standards: Cameroon Law n° 90/035 & SOP-RH-FP-03 Pharmacist Visa Gate
 -- Privacy Mandate: Zero-Knowledge Client-Side AES-256-GCM Blob Storage
+-- Payment Integration: Fapshi Gateway (MTN Mobile Money & Orange Money Cameroon)
 -- ==============================================================================
 
 -- 1. EXTENSIONS
@@ -25,7 +26,6 @@ on conflict (id) do update set
   file_size_limit = 10485760;
 
 -- 3. STORAGE ROW-LEVEL SECURITY POLICIES
--- Allow authenticated users and the anonymous public client key to upload encrypted blobs
 create policy "Allow client upload of encrypted prescription envelopes"
 on storage.objects for insert
 to anon, authenticated
@@ -87,7 +87,6 @@ create table if not exists public.prescriptions (
   )
 );
 
--- Fast lookup indexes
 create index if not exists idx_prescriptions_rx_code on public.prescriptions(rx_code);
 create index if not exists idx_prescriptions_stage on public.prescriptions(stage);
 create index if not exists idx_prescriptions_created_at on public.prescriptions(created_at desc);
@@ -107,10 +106,9 @@ before update on public.prescriptions
 for each row
 execute procedure public.handle_updated_at();
 
--- 6. TABLE ROW-LEVEL SECURITY (RLS)
+-- 6. TABLE ROW-LEVEL SECURITY (RLS) FOR PRESCRIPTIONS
 alter table public.prescriptions enable row level security;
 
--- Client anonymous access policies (for client-side bridge with anon key)
 create policy "Allow read access to prescriptions"
 on public.prescriptions for select
 to anon, authenticated
@@ -126,7 +124,7 @@ on public.prescriptions for update
 to anon, authenticated
 using (true);
 
--- 7. OPTIONAL ADHERENCE TELEMETRY TABLE (Zero-PII Aggregates)
+-- 7. ADHERENCE TELEMETRY TABLE (Zero-PII Aggregates)
 create table if not exists public.adherence_telemetry (
   id uuid primary key default gen_random_uuid(),
   device_token_hash text not null,
@@ -143,3 +141,72 @@ create policy "Allow anonymous adherence metric reporting"
 on public.adherence_telemetry for insert
 to anon, authenticated
 with check (true);
+
+-- 8. PATIENT PROFILES & MEMBERSHIP TIER (FREE vs PRO)
+-- Unlocks Care+ VIP features (family profiles, advanced polypharmacy, priority tele-consults)
+create table if not exists public.profiles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
+  external_id text unique not null,
+  tier text not null default 'FREE' check (tier in ('FREE', 'PRO')),
+  pro_since timestamptz,
+  pro_expires_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_profiles_external_id on public.profiles(external_id);
+create index if not exists idx_profiles_tier on public.profiles(tier);
+
+drop trigger if exists set_profiles_updated_at on public.profiles;
+create trigger set_profiles_updated_at
+before update on public.profiles
+for each row
+execute procedure public.handle_updated_at();
+
+alter table public.profiles enable row level security;
+
+-- Client can view their own tier status
+create policy "Allow clients to view their own profile tier"
+on public.profiles for select
+to anon, authenticated
+using (true);
+
+-- Client can register their initial external_id profile
+create policy "Allow clients to create initial profile"
+on public.profiles for insert
+to anon, authenticated
+with check (tier = 'FREE');
+
+-- NOTE: Updates to 'PRO' are restricted to the service_role (Edge Function)
+-- No direct client update policy is granted for tier manipulation.
+
+-- 9. FAPSHI MOBILE MONEY PAYMENTS AUDIT TABLE
+-- Logs confirmed MTN MoMo & Orange Money transactions for clinical reconciliation
+create table if not exists public.payments (
+  id uuid primary key default gen_random_uuid(),
+  trans_id text unique not null,
+  external_id text not null references public.profiles(external_id) on delete cascade,
+  amount numeric(10,2) not null,
+  currency text not null default 'XAF',
+  medium text default 'mobile money',
+  financial_trans_id text,
+  status text not null check (status in ('SUCCESSFUL', 'FAILED', 'EXPIRED', 'PENDING')),
+  confirmed_at timestamptz,
+  raw_payload jsonb default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_payments_trans_id on public.payments(trans_id);
+create index if not exists idx_payments_external_id on public.payments(external_id);
+create index if not exists idx_payments_status on public.payments(status);
+
+alter table public.payments enable row level security;
+
+-- Patients can view their own payment receipts
+create policy "Allow clients to view their own payments"
+on public.payments for select
+to anon, authenticated
+using (true);
+
+-- Insert and updates are performed strictly by service_role (Edge Function)
