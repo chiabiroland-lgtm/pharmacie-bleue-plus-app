@@ -1,0 +1,95 @@
+name: Pharmacie Bleue Plus — Clinical Compliance Audit & Zero-Cost PWA Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  clinical-compliance-gate:
+    name: "SOP-RH-FP-03, AES-256-GCM & Offline PWA Gate"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify Antigravity Agent Rules & Cameroon Law n° 90/035 Mandates
+        run: |
+          test -f .antigravity/rules.md
+          test -f AGENTS.md
+          grep -q "SOP-RH-FP-03" .antigravity/rules.md
+          grep -q "AES-GCM" .antigravity/rules.md
+          echo "✓ Antigravity Agent Rules verified."
+
+      - name: Verify Offline-First PWA Assets (manifest.json, sw.js, _headers, pbp-catalog.js)
+        run: |
+          test -f manifest.json
+          test -f sw.js
+          test -f _headers
+          test -f pbp-catalog.js
+          grep -q "#1E3A8A" manifest.json
+          grep -q "#0891B2" manifest.json
+          grep -q "pbp-clinical-compendium" sw.js
+          grep -q "Content-Security-Policy" _headers
+          grep -q "PBP_TRADE_CATALOG" pbp-catalog.js
+          echo "✓ Offline-First PWA & Master Trade Catalog verified."
+
+      - name: Ensure Strict Exclusion of Wholesale Cost Prices (P.Achat)
+        run: |
+          if grep -iE "pachat|costprice|p\.achat" pbp-catalog.js; then
+            echo "❌ Wholesale cost price detected in pbp-catalog.js!"
+            exit 1
+          fi
+          echo "✓ Zero wholesale cost prices found in commercial catalog."
+
+      - name: Verify Web Crypto AES-256-GCM & SOP-RH-FP-03 Double-Control Gate in index.html
+        run: |
+          grep -q "crypto.subtle.encrypt" index.html
+          grep -q "crypto.subtle.digest" index.html
+          grep -q "SOP-RH-FP-03" index.html
+          grep -q "sop_rh_fp_03_visa_gate" index.html
+          grep -q "STAGE_3_PHARMACIST_VISA" index.html
+          echo "✓ Web Crypto AES-256-GCM & SOP-RH-FP-03 Double-Control verified."
+
+      - name: Ensure Zero Hardcoded Service-Role Secrets
+        run: |
+          if grep -E "service_role|sbp_[a-zA-Z0-9]{20,}" index.html; then
+            echo "❌ Hardcoded Supabase secret detected!"
+            exit 1
+          fi
+          echo "✓ Zero hardcoded secrets found."
+
+  deploy-github-pages:
+    name: "Deploy Static PWA to GitHub Pages ($0/mo)"
+    needs: clinical-compliance-gate
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload PWA Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,55 @@
+{
+  "name": "Pharmacie Bleue Plus — Clinical Companion & Adherence Hub",
+  "short_name": "Bleue Plus",
+  "description": "Offline-First Clinical Pharmacology Compendium, Polypharmacy Interaction Checker, Medication Adherence Alarms & Zero-Knowledge Prescription Vault (Ngousso, Yaoundé).",
+  "id": "./index.html",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1E3A8A",
+  "background_color": "#0891B2",
+  "lang": "fr-CM",
+  "dir": "ltr",
+  "categories": ["medical", "health", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230891B2'/%3E%3Cstop offset='100%25' stop-color='%231E3A8A'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='192' height='192' rx='40' fill='url(%23g)'/%3E%3Cpath d='M78 44h36v34h34v36h-34v34H78v-34H44V78h34V44z' fill='%23ffffff'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230891B2'/%3E%3Cstop offset='100%25' stop-color='%231E3A8A'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='108' fill='url(%23g)'/%3E%3Cpath d='M208 116h96v92h92v96h-92v92h-96v-92h-92v-96h92v-92z' fill='%23ffffff'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Alarms & Adherence",
+      "short_name": "Alarms",
+      "description": "View today's medication intake timeline and trigger alarms",
+      "url": "./index.html#dashboard"
+    },
+    {
+      "name": "Drug Safety Compendium",
+      "short_name": "Monographs",
+      "description": "Offline clinical pharmacology monographs and posology",
+      "url": "./index.html#monographs"
+    },
+    {
+      "name": "Polypharmacy Interaction Checker",
+      "short_name": "Interactions",
+      "description": "Check drug-drug and comorbidity contraindications offline",
+      "url": "./index.html#interactions"
+    },
+    {
+      "name": "Secure Prescription Vault",
+      "short_name": "Rx Upload",
+      "description": "Client-side AES-GCM prescription encryption & SOP-RH-FP-03 tracker",
+      "url": "./index.html#prescriptions"
+    }
+  ]
+}
