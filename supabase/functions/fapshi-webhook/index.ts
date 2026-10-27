@@ -142,7 +142,12 @@ serve(async (req: Request) => {
     if (paymentErr) {
       console.error(`[ERROR] Failed to record payment ${payload.transId}:`, paymentErr);
       return new Response(
-        JSON.stringify({ error: "Failed to persist payment audit record." }),
+        JSON.stringify({
+          error: "Failed to persist payment audit record.",
+          dbError: paymentErr.message,
+          details: paymentErr.details,
+          hint: paymentErr.hint
+        }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -167,7 +172,12 @@ serve(async (req: Request) => {
       if (tierErr) {
         console.error(`[ERROR] Failed to flip tier to PRO for ${payload.externalId}:`, tierErr);
         return new Response(
-          JSON.stringify({ error: "Payment recorded but failed to upgrade tier." }),
+          JSON.stringify({
+            error: "Payment recorded but failed to upgrade tier.",
+            dbError: tierErr.message,
+            details: tierErr.details,
+            hint: tierErr.hint
+          }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
