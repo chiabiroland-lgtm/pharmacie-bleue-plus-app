@@ -12,6 +12,7 @@ const CLINICAL_SNAPSHOT_URL = './offline-clinical-compendium.json';
 const CORE_SHELL_ASSETS = [
   './',
   './index.html',
+  './admin.html',
   './manifest.json',
   './pbp-catalog.js',
   './js/supabase-bridge.js'

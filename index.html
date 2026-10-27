@@ -83,8 +83,8 @@
 </head>
 <body class="bg-[#F8FAFC] text-slate-800 antialiased min-h-screen flex flex-col pb-16 sm:pb-0">
 
-  <!-- Unified Google "Superlight" Frosted-Glass Sticky Header -->
-  <header class="glass-panel border-b border-slate-200/80 sticky top-0 z-30 transition-all">
+  <!-- Unified Google "Superlight" Frosted-Glass Sticky Header (Patient Frontend UI) -->
+  <header id="patientHeaderBar" class="glass-panel border-b border-slate-200/80 sticky top-0 z-30 transition-all">
     <div class="max-w-7xl mx-auto px-4 pt-2.5 pb-2 flex flex-col gap-2.5">
       <!-- Top Row: Brand + Google Omni-Search Spotlight Pill + Compact Utility Actions -->
       <div class="flex flex-wrap items-center justify-between gap-3">
@@ -100,7 +100,7 @@
                 Free Tier
               </span>
             </div>
-            <p id="headerSubtitle" class="text-[11px] text-slate-500 hidden sm:block">Ngousso, Yaoundé • Tél: 222 21 14 92 • Clinical Companion &amp; Encrypted Vault</p>
+            <p id="headerSubtitle" class="text-[11px] text-slate-500 hidden sm:block">Ngousso, Yaoundé • Tél: 222 21 14 92 • Patient Companion &amp; Care</p>
           </div>
         </div>
 
@@ -157,8 +157,8 @@
         </div>
       </div>
 
-      <!-- Segmented Superlight Navigation Bar -->
-      <nav class="flex items-center gap-1 overflow-x-auto no-scrollbar pt-0.5">
+      <!-- Segmented Superlight Patient Navigation Bar (Strictly 5 Patient Care Tabs) -->
+      <nav class="flex items-center gap-1 overflow-x-auto no-scrollbar pt-0.5" aria-label="Patient Care Navigation">
         <button onclick="switchTab('dashboard')" id="tabBtn-dashboard" class="nav-tab-btn px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 bg-blue-900 text-white shadow-2xs transition">
           <i data-lucide="clock" class="w-3.5 h-3.5"></i>
           <span data-i18n="navDashboard">Alarms &amp; Adherence</span>
@@ -166,28 +166,93 @@
         </button>
         <button onclick="switchTab('prescriptions')" id="tabBtn-prescriptions" class="nav-tab-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
           <i data-lucide="file-lock-2" class="w-3.5 h-3.5"></i>
-          <span data-i18n="navPrescriptions">Secure Rx Upload</span>
+          <span data-i18n="navPrescriptions">Prescription Upload</span>
           <kbd class="hidden lg:inline-block text-[9px] opacity-50 font-mono ml-0.5">2</kbd>
         </button>
         <button onclick="switchTab('monographs')" id="tabBtn-monographs" class="nav-tab-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
           <i data-lucide="book-open-check" class="w-3.5 h-3.5"></i>
-          <span data-i18n="navMonographs">Drug Compendium</span>
+          <span data-i18n="navMonographs">Drug Catalog</span>
           <kbd class="hidden lg:inline-block text-[9px] opacity-50 font-mono ml-0.5">3</kbd>
         </button>
         <button onclick="switchTab('interactions')" id="tabBtn-interactions" class="nav-tab-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
           <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
-          <span data-i18n="navInteractions">Interactions &amp; Safety</span>
+          <span data-i18n="navInteractions">Safety &amp; Interactions</span>
           <kbd class="hidden lg:inline-block text-[9px] opacity-50 font-mono ml-0.5">4</kbd>
         </button>
         <button onclick="switchTab('healthtips')" id="tabBtn-healthtips" class="nav-tab-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
           <i data-lucide="heart-pulse" class="w-3.5 h-3.5"></i>
-          <span data-i18n="navHealthTips">Disease Tips &amp; Vitals</span>
+          <span data-i18n="navHealthTips">Health Tips &amp; Vitals</span>
           <kbd class="hidden lg:inline-block text-[9px] opacity-50 font-mono ml-0.5">5</kbd>
         </button>
-        <button onclick="switchTab('blueprint')" id="tabBtn-blueprint" class="nav-tab-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition ml-auto">
+        <!-- Hidden from Patient View; unlocked only in Pharmacist/Admin Backend -->
+        <button onclick="switchTab('blueprint')" id="tabBtn-blueprint" class="hidden nav-tab-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition ml-auto">
           <i data-lucide="terminal" class="w-3.5 h-3.5 text-cyan-600"></i>
           <span>Cloud &amp; Self-Test</span>
           <kbd class="hidden lg:inline-block text-[9px] opacity-50 font-mono ml-0.5">6</kbd>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Specialized Dark-Slate Pharmacist & Technical Admin Backend Header (#/admin) -->
+  <header id="adminHeaderBar" class="hidden sticky top-0 z-40 bg-slate-950 text-white border-b border-slate-800 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="py-3 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-cyan-500/15 border border-cyan-400/40 flex items-center justify-center shrink-0">
+            <i data-lucide="shield-check" class="w-5 h-5 text-cyan-400"></i>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-[10px] font-extrabold uppercase tracking-widest bg-amber-400/15 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full">
+                Authenticated Staff &amp; Admin Route (#/admin)
+              </span>
+              <span id="adminActiveRoleBadge" class="text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+                Dr. Chiabi Roland — ONPC Section A N° 1184
+              </span>
+            </div>
+            <h1 class="text-sm sm:text-base font-black tracking-tight text-white mt-0.5">
+              PHARMACIE BLEUE PLUS — NGOUSSO CLINICAL &amp; TECHNICAL BACKEND CONSOLE
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="filterAdminDesk('bridge')" id="rxTabBridgeBadge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-700 hover:bg-cyan-900 transition" title="Inspect Modular Supabase Bridge & Outbox">
+            Supabase Bridge: LOCAL_MOCK_VAULT (0 Staged)
+          </button>
+          <button onclick="runFullComplianceSelfTest()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold px-3.5 py-1.5 rounded-full shadow-xs transition flex items-center gap-1.5">
+            <i data-lucide="play" class="w-3.5 h-3.5 text-cyan-300"></i>
+            <span>Run 8-Phase Self-Test</span>
+          </button>
+          <button onclick="exitAdminPortal()" class="bg-slate-800 hover:bg-rose-950 hover:text-rose-200 hover:border-rose-700 text-slate-200 border border-slate-700 text-xs font-bold px-3.5 py-1.5 rounded-full transition flex items-center gap-1.5">
+            <i data-lucide="lock" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>← Lock &amp; Return to Patient App</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin Backend Sub-Desk Filter Bar -->
+      <nav class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2 border-t border-slate-800/90 text-xs" aria-label="Admin Backend Desks">
+        <button onclick="filterAdminDesk('ALL')" id="adminDeskBtn-ALL" class="admin-desk-btn px-3 py-1.5 rounded-full font-bold bg-cyan-500 text-slate-950 whitespace-nowrap flex items-center gap-1.5 transition">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+          <span>All Backend Desks</span>
+        </button>
+        <button onclick="filterAdminDesk('dispensing')" id="adminDeskBtn-dispensing" class="admin-desk-btn px-3 py-1.5 rounded-full font-medium text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap flex items-center gap-1.5 transition">
+          <i data-lucide="clipboard-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>1. SOP-RH-FP-03 Dispensing &amp; Formulary</span>
+        </button>
+        <button onclick="filterAdminDesk('crypto')" id="adminDeskBtn-crypto" class="admin-desk-btn px-3 py-1.5 rounded-full font-medium text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap flex items-center gap-1.5 transition">
+          <i data-lucide="key-round" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span>2. Web Crypto AES-256-GCM Vault</span>
+        </button>
+        <button onclick="filterAdminDesk('bridge')" id="adminDeskBtn-bridge" class="admin-desk-btn px-3 py-1.5 rounded-full font-medium text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap flex items-center gap-1.5 transition">
+          <i data-lucide="cloud-cog" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>3. Supabase Bridge &amp; Fapshi MoMo</span>
+        </button>
+        <button onclick="filterAdminDesk('selftest')" id="adminDeskBtn-selftest" class="admin-desk-btn px-3 py-1.5 rounded-full font-medium text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap flex items-center gap-1.5 transition">
+          <i data-lucide="terminal" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span>4. 8-Phase Self-Test &amp; DevOps Kit</span>
         </button>
       </nav>
     </div>
@@ -431,74 +496,43 @@
           </div>
         </div>
 
-        <!-- Right 5 Cols: Double-Control Pharmacist Queue & Cryptographic Proof -->
+        <!-- Right 5 Cols: Clean Patient Live Prescription Status Tracker & Ngousso Pickup Guide -->
         <div class="lg:col-span-5 space-y-5">
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
             <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
               <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
                 <i data-lucide="clipboard-check" class="w-5 h-5 text-emerald-600"></i>
-                <span>Step 2: Pharmacist Double-Control Tracker</span>
+                <span>My Prescription Preparation Status</span>
               </h3>
-              <button onclick="switchTab('blueprint')" id="rxTabBridgeBadge" class="text-[10px] font-bold font-mono px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition">
-                Bridge: Local Mock Vault ⚙
-              </button>
+              <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                ONPC Double-Control Protected
+              </span>
             </div>
             <p class="text-xs text-slate-500 mb-4">
-              Every uploaded prescription receives a one-time cryptographic token and goes through our 4-step clinical verification workflow (`SOP-RH-FP-03`).
+              Track your prescription in real time as our Ngousso pharmacy team prepares your medications and a Section A ONPC Pharmacist validates your posology (`SOP-RH-FP-03`).
             </p>
             <div id="rxQueueContainer" class="space-y-3"></div>
           </div>
 
-          <!-- Cryptographic Audit Card (Web Crypto API AES-256-GCM) -->
-          <div class="bg-slate-900 text-slate-200 rounded-2xl p-5 space-y-3 border border-slate-800 shadow-lg">
+          <!-- Patient Reassurance & Ngousso Counter Pickup Card -->
+          <div class="superlight-card rounded-2xl p-5 space-y-3 border border-slate-200">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-                <i data-lucide="key-round" class="w-4 h-4"></i> Web Crypto Ephemeral Session Vault
+              <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="w-4 h-4 text-cyan-600"></i> Zero-Knowledge Privacy &amp; Fast-Track Pickup
               </span>
-              <span id="cryptoEngineStatusBadge" class="text-[11px] bg-slate-800 text-emerald-400 px-2 py-0.5 rounded font-mono border border-emerald-500/30">SubtleCrypto AES-256-GCM</span>
+              <span class="text-[10px] font-bold bg-cyan-50 text-cyan-800 px-2.5 py-0.5 rounded-full border border-cyan-200">AES-256-GCM</span>
             </div>
-            <p class="text-xs text-slate-400">
-              Your redacted prescription canvas is hashed (`SHA-256`) and encrypted in-memory via `window.crypto.subtle` (`AES-GCM` 256-bit key + 96-bit random IV + 128-bit auth tag) before entering the queue.
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Your prescription photo is redacted and encrypted directly on your phone before transmission. Only our licensed Section A ONPC pharmacists at <strong>Pharmacie Bleue Plus (Face Hôpital Général de Yaoundé, Ngousso)</strong> can validate and release your order.
             </p>
-            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-[11px] space-y-1.5 break-all">
-              <div id="cryptoHashDisplay" class="text-cyan-300">
-                Plaintext SHA-256: Computing real SubtleCrypto digest...
+            <div class="grid grid-cols-2 gap-2.5 pt-1 text-[11px]">
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                <strong class="text-slate-900 block">📍 Express Counter</strong>
+                <span class="text-slate-500">Present your <code>RX-2026</code> code &amp; original paper prescription at pickup.</span>
               </div>
-              <div id="cryptoIvDisplay" class="text-amber-300">
-                AES-GCM 96-bit IV: Awaiting encryption trigger...
-              </div>
-              <div id="cryptoCipherDigestDisplay" class="text-emerald-300">
-                Ciphertext SHA-256: Awaiting encryption trigger...
-              </div>
-              <div id="cryptoPayloadStatsDisplay" class="text-slate-400 text-[10px]">
-                AAD: PharmacieBleuePlus-SOP-RH-FP-03 • TagLength: 128-bit
-              </div>
-            </div>
-
-            <!-- Interactive Round-Trip Decryption & Envelope Export Controls -->
-            <div class="flex flex-wrap items-center gap-2 pt-1">
-              <button onclick="verifyDecryptionRoundTrip()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-                <span>Verify Decryption Round-Trip</span>
-              </button>
-              <button onclick="downloadEncryptedRxEnvelope()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center justify-center gap-1.5" title="Download AES-GCM Encrypted JSON Envelope">
-                <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-400"></i>
-                <span>.enc JSON</span>
-              </button>
-            </div>
-
-            <!-- Round-Trip Decryption Proof Container -->
-            <div id="decryptionProofBox" class="hidden bg-slate-950/90 border border-emerald-500/40 rounded-xl p-3 space-y-2 text-xs">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-emerald-400 flex items-center gap-1">
-                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
-                  <span id="decryptionProofTitle">AES-GCM Decryption Verified (100% Byte Match)</span>
-                </span>
-                <span id="decryptionProofTiming" class="font-mono text-[10px] text-slate-400"></span>
-              </div>
-              <p id="decryptionProofDetails" class="text-[11px] text-slate-300 font-mono break-all"></p>
-              <div class="rounded-lg overflow-hidden border border-slate-800 bg-slate-900 p-1.5">
-                <img id="decryptedPreviewImg" alt="Decrypted Prescription Proof" class="w-full h-auto rounded" />
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                <strong class="text-slate-900 block">📞 Pharmacist Line</strong>
+                <span class="text-slate-500">Ngousso Desk: <strong>222 21 14 92</strong> / WhatsApp <strong>656 03 64 67</strong></span>
               </div>
             </div>
           </div>
@@ -648,26 +682,28 @@
               Monographies pharmacologiques officielles de l'officine (Loi n° 90/035 &amp; SOP-RH-FP-03).
             </span>
             <div class="flex flex-wrap items-center gap-2">
-              <button onclick="openMonographModal()" class="bg-blue-900 hover:bg-blue-800 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
-                <i data-lucide="plus-circle" class="w-4 h-4 text-cyan-300"></i>
-                <span>+ Ajouter une Monographie</span>
-              </button>
-              <button onclick="exportMonographsJson()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl border border-slate-300 transition flex items-center gap-1.5" title="Exporter le compendium au format JSON">
-                <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-700"></i>
-                <span>Exporter JSON</span>
-              </button>
-              <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl border border-slate-300 transition flex items-center gap-1.5" title="Importer une base JSON">
-                <i data-lucide="upload" class="w-3.5 h-3.5 text-emerald-700"></i>
-                <span>Importer JSON</span>
-                <input type="file" id="monographImportFile" accept=".json,application/json" onchange="importMonographsJson(event)" class="hidden">
-              </label>
-              <button onclick="resetMonographsToBaseline()" class="bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold px-3 py-2 rounded-xl border border-amber-300 transition flex items-center gap-1.5" title="Restaurer le compendium LNME officiel">
-                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-amber-700"></i>
-                <span>Restaurer LNME</span>
-              </button>
+              <div id="patientMonoStaffControls" class="admin-only-control hidden flex-wrap items-center gap-2">
+                <button onclick="openMonographModal()" class="bg-blue-900 hover:bg-blue-800 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+                  <i data-lucide="plus-circle" class="w-4 h-4 text-cyan-300"></i>
+                  <span>+ Ajouter une Monographie</span>
+                </button>
+                <button onclick="exportMonographsJson()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl border border-slate-300 transition flex items-center gap-1.5" title="Exporter le compendium au format JSON">
+                  <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-700"></i>
+                  <span>Exporter JSON</span>
+                </button>
+                <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl border border-slate-300 transition flex items-center gap-1.5" title="Importer une base JSON">
+                  <i data-lucide="upload" class="w-3.5 h-3.5 text-emerald-700"></i>
+                  <span>Importer JSON</span>
+                  <input type="file" id="monographImportFile" accept=".json,application/json" onchange="importMonographsJson(event)" class="hidden">
+                </label>
+                <button onclick="resetMonographsToBaseline()" class="bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold px-3 py-2 rounded-xl border border-amber-300 transition flex items-center gap-1.5" title="Restaurer le compendium LNME officiel">
+                  <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-amber-700"></i>
+                  <span>Restaurer LNME</span>
+                </button>
+              </div>
               <button onclick="openAdrReportModal()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
                 <i data-lucide="alert-octagon" class="w-4 h-4"></i>
-                <span>Signaler ADR</span>
+                <span>Signaler Effet Indésirable (ADR)</span>
               </button>
             </div>
           </div>
@@ -914,23 +950,124 @@
       </div>
     </section>
 
-    <!-- ================= TAB 6: ANTIGRAVITY + GITHUB VIBECODING KIT ================= -->
+    <!-- ================= AUTHENTICATED PHARMACIST & TECHNICAL ADMIN BACKEND (#/admin) ================= -->
     <section id="view-blueprint" class="hidden space-y-6">
       <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-md border border-slate-800">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span class="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/30">
-              Zero-Cost Vibecoding Kit
+              Ngousso Staff &amp; Architect Backend (#/admin)
             </span>
-            <h2 class="text-2xl font-extrabold mt-2">Google Antigravity + GitHub + Supabase Starter Kit</h2>
+            <h2 class="text-2xl font-extrabold mt-2">Pharmacist Double-Control, Crypto Telemetry &amp; Cloud Self-Test Console</h2>
             <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-3xl">
-              Copy these ready-made configuration files (`AGENTS.md`, Supabase SQL Row-Level Security schema, and Antigravity Agent Prompts) directly into your Google Antigravity IDE workspace to scale this prototype into production for $0/month.
+              Dedicated backend workspace for Pharmacie Bleue Plus staff at Ngousso and technical administrators. Execute <code>SOP-RH-FP-03</code> prescription validation, inspect Web Crypto <code>AES-256-GCM</code> envelopes, manage the Supabase/Fapshi bridge, and run the 8-Phase Automated Self-Test Suite.
             </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <button onclick="openMonographModal()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>+ Add Clinical Monograph</span>
+            </button>
+            <button onclick="runFullComplianceSelfTest()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-cyan-300"></i>
+              <span>Run 8-Phase Audit</span>
+            </button>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- ADMIN DESK 1 & 2: SOP-RH-FP-03 DISPENSING DESK + WEB CRYPTO AES-256-GCM VAULT -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Admin Desk 1 (7 Cols): Ngousso Pharmacist Double-Control Queue & Formulary CRUD -->
+        <div id="adminDesk-dispensing" class="admin-desk-section lg:col-span-7 bg-white rounded-2xl shadow-sm border-2 border-slate-200 p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">Admin Desk 1 • Cameroon Law n° 90/035</span>
+              <h3 class="text-base font-extrabold text-slate-900 mt-1 flex items-center gap-2">
+                <i data-lucide="clipboard-check" class="w-5 h-5 text-emerald-600"></i>
+                <span>SOP-RH-FP-03 Pharmacist Dispensing Queue &amp; Formulary Controls</span>
+              </h3>
+            </div>
+            <button onclick="switchTab('monographs'); setCompendiumTabMode('monographs');" class="text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 px-3 py-1.5 rounded-xl border border-blue-200 transition flex items-center gap-1">
+              <i data-lucide="book-open-check" class="w-3.5 h-3.5"></i>
+              <span>Manage DCI Monographs</span>
+            </button>
+          </div>
+
+          <!-- Staff Formulary CRUD Quick Bar -->
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span class="font-bold text-slate-700 flex items-center gap-1.5">
+              <i data-lucide="database" class="w-3.5 h-3.5 text-cyan-700"></i>
+              <span>LNME / PGO Formulary Admin:</span>
+            </span>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button onclick="openMonographModal()" class="bg-blue-900 hover:bg-blue-800 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition">+ New Monograph</button>
+              <button onclick="exportMonographsJson()" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition">Export JSON</button>
+              <button onclick="resetMonographsToBaseline()" class="bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition">Restore LNME</button>
+            </div>
+          </div>
+
+          <div id="adminRxQueueContainer" class="space-y-3"></div>
+        </div>
+
+        <!-- Admin Desk 2 (5 Cols): Relocated Web Crypto Ephemeral Session Vault (AES-256-GCM) -->
+        <div id="adminDesk-crypto" class="admin-desk-section lg:col-span-5 space-y-5">
+          <div class="bg-slate-900 text-slate-200 rounded-2xl p-5 space-y-3.5 border border-slate-800 shadow-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+                <i data-lucide="key-round" class="w-4 h-4"></i> Admin Desk 2 • Web Crypto Session Vault
+              </span>
+              <span id="cryptoEngineStatusBadge" class="text-[11px] bg-slate-800 text-emerald-400 px-2 py-0.5 rounded font-mono border border-emerald-500/30">SubtleCrypto AES-256-GCM</span>
+            </div>
+            <p class="text-xs text-slate-400">
+              Live cryptographic telemetry for patient prescription uploads (`SHA-256` plaintext &amp; ciphertext digests, `AES-GCM` 256-bit key + 96-bit IV + 128-bit auth tag).
+            </p>
+            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-[11px] space-y-1.5 break-all">
+              <div id="cryptoHashDisplay" class="text-cyan-300">
+                Plaintext SHA-256: Computing real SubtleCrypto digest...
+              </div>
+              <div id="cryptoIvDisplay" class="text-amber-300">
+                AES-GCM 96-bit IV: Awaiting encryption trigger...
+              </div>
+              <div id="cryptoCipherDigestDisplay" class="text-emerald-300">
+                Ciphertext SHA-256: Awaiting encryption trigger...
+              </div>
+              <div id="cryptoPayloadStatsDisplay" class="text-slate-400 text-[10px]">
+                AAD: PharmacieBleuePlus-SOP-RH-FP-03 • TagLength: 128-bit
+              </div>
+            </div>
+
+            <!-- Interactive Round-Trip Decryption & Envelope Export Controls -->
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <button onclick="verifyDecryptionRoundTrip()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                <span>Verify Decryption Round-Trip</span>
+              </button>
+              <button onclick="downloadEncryptedRxEnvelope()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center justify-center gap-1.5" title="Download AES-GCM Encrypted JSON Envelope">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>.enc JSON</span>
+              </button>
+            </div>
+
+            <!-- Round-Trip Decryption Proof Container -->
+            <div id="decryptionProofBox" class="hidden bg-slate-950/90 border border-emerald-500/40 rounded-xl p-3 space-y-2 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-emerald-400 flex items-center gap-1">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                  <span id="decryptionProofTitle">AES-GCM Decryption Verified (100% Byte Match)</span>
+                </span>
+                <span id="decryptionProofTiming" class="font-mono text-[10px] text-slate-400"></span>
+              </div>
+              <p id="decryptionProofDetails" class="text-[11px] text-slate-300 font-mono break-all"></p>
+              <div class="rounded-lg overflow-hidden border border-slate-800 bg-slate-900 p-1.5">
+                <img id="decryptedPreviewImg" alt="Decrypted Prescription Proof" class="w-full h-auto rounded" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="adminDesk-devops" class="admin-desk-section grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Box 1: AGENTS.md / .antigravity/rules.md -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
           <div>
@@ -1182,12 +1319,12 @@ using (true);
         </div>
 
         <!-- Box 3: Modular Supabase Free-Tier Bridge & Local Mock Outbox Console -->
-        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5">
+        <div id="adminDesk-bridge" class="admin-desk-section lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
               <div class="flex items-center gap-2">
                 <i data-lucide="cloud-cog" class="w-5 h-5 text-cyan-600"></i>
-                <h3 class="text-base font-extrabold text-slate-900">3. Modular Supabase Free-Tier Bridge (Mock-First Hybrid Connector)</h3>
+                <h3 class="text-base font-extrabold text-slate-900">Admin Desk 3 • Modular Supabase Free-Tier Bridge &amp; Fapshi MoMo</h3>
               </div>
               <p class="text-xs text-slate-500 mt-0.5">
                 Operates in <strong>Zero-Error Local Mock Mode</strong> by default. Enter your Supabase Free Tier credentials below to switch to live cloud synchronization (Private Bucket <code>prescriptions</code> + Postgres RLS). Credentials are saved only in your local IndexedDB vault.
@@ -1253,16 +1390,16 @@ using (true);
           </div>
         </div>
 
-        <!-- Box 4: Phase 5 Zero-Cost CI/CD Hardening & Automated 5-Phase Self-Test Suite -->
-        <div class="bg-white rounded-2xl border-2 border-indigo-200 p-5 shadow-sm flex flex-col gap-4 lg:col-span-2">
+        <!-- Box 4: Phase 5–8 Zero-Cost CI/CD Hardening & Automated 8-Phase Self-Test Suite -->
+        <div id="adminDesk-selftest" class="admin-desk-section bg-white rounded-2xl border-2 border-indigo-200 p-5 shadow-sm flex flex-col gap-4 lg:col-span-2">
           <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
             <div>
               <div class="flex items-center gap-2">
                 <i data-lucide="shield-check" class="w-5 h-5 text-indigo-600"></i>
-                <h3 class="text-base font-extrabold text-slate-900">4. Zero-Cost CI/CD Hardening (<code>_headers</code> + GitHub Actions) &amp; 5-Phase Self-Test Suite</h3>
+                <h3 class="text-base font-extrabold text-slate-900">Admin Desk 4 • Zero-Cost CI/CD Hardening &amp; 8-Phase Automated Self-Test Suite</h3>
               </div>
               <p class="text-xs text-slate-500 mt-0.5">
-                Production security headers for <strong>Cloudflare Pages</strong> (<code>_headers</code>), automated <strong>GitHub Actions</strong> compliance pipeline (<code>.github/workflows/deploy.yml</code>), and live browser verification across all 5 phases.
+                Production security headers for <strong>Cloudflare Pages</strong> (<code>_headers</code>), automated <strong>GitHub Actions</strong> compliance pipeline (<code>.github/workflows/deploy.yml</code>), and live browser verification across all 8 phases.
               </p>
             </div>
             <button onclick="runFullComplianceSelfTest()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 shrink-0">
@@ -1865,9 +2002,69 @@ jobs:
           <span class="font-medium text-slate-700">Close Any Active Modal</span>
           <kbd class="kbd-pill">Esc</kbd>
         </div>
+        <div class="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-slate-900 text-slate-200">
+          <span class="font-medium text-cyan-300">Ngousso Staff &amp; Admin Console (#/admin)</span>
+          <kbd class="kbd-pill bg-slate-800 text-cyan-300 border-slate-700">Ctrl Shift A</kbd>
+        </div>
       </div>
       <div class="flex justify-end pt-2 border-t border-slate-100">
         <button onclick="closeShortcutsModal()" class="px-4 py-1.5 rounded-full text-xs font-bold bg-blue-900 text-white hover:bg-blue-800 transition">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 10: NGOUSSO PHARMACIST & TECHNICAL ADMIN AUTHENTICATION GATE ================= -->
+  <div id="adminAuthModal" onclick="if(event.target===this)closeAdminAuthModal()" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="bg-slate-900 text-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-700 space-y-5">
+      <div class="flex items-start justify-between gap-3 border-b border-slate-800 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-cyan-500/15 border border-cyan-400/40 flex items-center justify-center shrink-0">
+            <i data-lucide="shield-lock" class="w-5 h-5 text-cyan-400"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-300 bg-amber-400/15 px-2.5 py-0.5 rounded-full border border-amber-400/30">
+              Restricted Staff Route (#/admin)
+            </span>
+            <h3 class="text-base font-black text-white mt-1">Ngousso Pharmacist &amp; Admin Login</h3>
+          </div>
+        </div>
+        <button onclick="closeAdminAuthModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Authenticate to unlock the <strong>Pharmacie Bleue Plus Backend Console</strong> (`SOP-RH-FP-03` Double-Control Visa Queue, Web Crypto `AES-256-GCM` Telemetry, Supabase/Fapshi Bridge &amp; 8-Phase Self-Test Suite).
+      </p>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label for="adminRoleSelect" class="block font-bold text-slate-300 mb-1">Authenticated Staff / Architect Identity *</label>
+          <select id="adminRoleSelect" class="w-full rounded-xl bg-slate-950 border border-slate-700 text-white px-3 py-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-cyan-500">
+            <option value="Dr. Chiabi Roland — Assistant (ONPC Section A N° 1184)">Dr. Chiabi Roland — Assistant (ONPC Section A N° 1184)</option>
+            <option value="Dr. Titulaire Bleue Plus — Titulaire (ONPC Section A N° 0492)">Dr. Titulaire Bleue Plus — Titulaire (ONPC Section A N° 0492)</option>
+            <option value="System Architect &amp; DevOps Admin (Ngousso Telemetry)">System Architect &amp; DevOps Admin (Ngousso Telemetry)</option>
+          </select>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label for="adminPinInput" class="font-bold text-slate-300">ONPC Staff Security PIN / Passcode *</label>
+            <span class="text-[10px] font-mono text-cyan-400">Demo PIN: 2026 or 1184</span>
+          </div>
+          <input type="password" id="adminPinInput" value="2026" onkeydown="if(event.key==='Enter')authenticateAdminPortal()" placeholder="Enter 4-digit Staff PIN (e.g. 2026)" class="w-full rounded-xl bg-slate-950 border border-slate-700 text-cyan-300 font-mono text-sm px-3.5 py-2.5 tracking-widest focus:outline-none focus:ring-2 focus:ring-cyan-500">
+          <p id="adminAuthErrorMsg" class="hidden text-[11px] font-bold text-rose-400 mt-1.5">
+            Invalid ONPC Staff PIN. Use authorized PIN (2026 or 1184).
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-800">
+        <button onclick="closeAdminAuthModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-800 transition">
+          Cancel
+        </button>
+        <button onclick="authenticateAdminPortal()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-md transition flex items-center gap-1.5">
+          <i data-lucide="unlock" class="w-4 h-4"></i>
+          <span>Unlock Backend Console</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1880,7 +2077,7 @@ jobs:
     </button>
     <button onclick="switchTab('prescriptions')" id="mobTab-prescriptions" class="flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl">
       <i data-lucide="file-lock-2" class="w-4 h-4"></i>
-      <span>Rx Vault</span>
+      <span>Rx Upload</span>
     </button>
     <button onclick="openCommandPalette()" class="flex flex-col items-center justify-center -mt-3 w-10 h-10 rounded-full bg-blue-900 text-white shadow-md">
       <i data-lucide="search" class="w-4 h-4"></i>
@@ -1907,9 +2104,13 @@ jobs:
       <div>
         <strong>Pharmacie Bleue Plus SARL</strong> — 1468 Rue 1.564 Ngousso (Face Hôpital Général de Yaoundé) • RCCM: RC/YAO/2018/B/814
       </div>
-      <div class="flex items-center gap-3 text-slate-400">
+      <div class="flex flex-wrap items-center gap-3 text-slate-400">
         <span>Loi n° 90/035 &amp; SOP-RH-FP-03</span>
         <button onclick="openShortcutsModal()" class="text-slate-500 hover:text-blue-900 underline">Shortcuts (?)</button>
+        <button onclick="openAdminPortalTrigger()" id="footerStaffPortalBtn" class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-blue-950 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-full border border-slate-200 transition" title="Ngousso Pharmacist &amp; Technical Admin Console (#/admin)">
+          <i data-lucide="lock" class="w-3 h-3 text-cyan-700"></i>
+          <span>Staff / Admin Console</span>
+        </button>
       </div>
     </div>
   </footer>
@@ -2823,8 +3024,195 @@ jobs:
       }
     }
 
+    // --- DEDICATED PHARMACIST / ADMIN BACKEND ROUTE (#/admin) & AUTH CONTROLLER ---
+    let isAdminAuthenticated = false;
+    let isAdminPortalActive = false;
+    let activeAdminDeskFilter = 'ALL';
+    const AUTHORIZED_ADMIN_PINS = ['2026', '1184', '0492'];
+
+    function syncAdminControlsVisibility() {
+      const monoStaffBar = document.getElementById('patientMonoStaffControls');
+      if (monoStaffBar) {
+        if (isAdminAuthenticated) {
+          monoStaffBar.classList.remove('hidden');
+          monoStaffBar.classList.add('flex');
+        } else {
+          monoStaffBar.classList.add('hidden');
+          monoStaffBar.classList.remove('flex');
+        }
+      }
+      document.querySelectorAll('.admin-only-control').forEach(el => {
+        if (el.id === 'patientMonoStaffControls') return;
+        if (isAdminAuthenticated) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+    }
+
+    function openAdminPortalTrigger() {
+      if (isAdminAuthenticated) {
+        activateAdminBackendView();
+        return;
+      }
+      const m = document.getElementById('adminAuthModal');
+      const err = document.getElementById('adminAuthErrorMsg');
+      const pinInp = document.getElementById('adminPinInput');
+      if (err) err.classList.add('hidden');
+      if (m) {
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+      }
+      if (pinInp) setTimeout(() => pinInp.focus(), 30);
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeAdminAuthModal() {
+      const m = document.getElementById('adminAuthModal');
+      if (!m) return;
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+      const rawHash = (window.location.hash || '').toLowerCase();
+      if (!isAdminAuthenticated && (rawHash === '#/admin' || rawHash === '#admin')) {
+        try { window.history.replaceState(null, '', '#dashboard'); } catch (_) {}
+      }
+    }
+
+    function authenticateAdminPortal(overridePin) {
+      const pinInp = document.getElementById('adminPinInput');
+      const roleSel = document.getElementById('adminRoleSelect');
+      const err = document.getElementById('adminAuthErrorMsg');
+      const enteredPin = typeof overridePin === 'string'
+        ? overridePin.trim()
+        : (pinInp ? pinInp.value.trim() : '');
+
+      if (!AUTHORIZED_ADMIN_PINS.includes(enteredPin)) {
+        if (err) err.classList.remove('hidden');
+        showToast('Access Denied: Invalid ONPC Staff PIN.');
+        return false;
+      }
+
+      isAdminAuthenticated = true;
+      const selectedRole = roleSel ? roleSel.value : 'Dr. Chiabi Roland — Assistant (ONPC Section A N° 1184)';
+      try {
+        sessionStorage.setItem('pbp_admin_auth', '1');
+        sessionStorage.setItem('pbp_admin_role', selectedRole);
+      } catch (_) {}
+
+      const roleBadge = document.getElementById('adminActiveRoleBadge');
+      if (roleBadge) roleBadge.textContent = selectedRole;
+
+      if (err) err.classList.add('hidden');
+      closeAdminAuthModal();
+      activateAdminBackendView();
+      showToast(`Authenticated as ${selectedRole} — Ngousso Backend Console unlocked.`);
+      return true;
+    }
+
+    function activateAdminBackendView() {
+      isAdminAuthenticated = true;
+      isAdminPortalActive = true;
+      const patientHdr = document.getElementById('patientHeaderBar');
+      const adminHdr = document.getElementById('adminHeaderBar');
+      const mobNav = document.getElementById('mobileBottomNav');
+      if (patientHdr) patientHdr.classList.add('hidden');
+      if (adminHdr) adminHdr.classList.remove('hidden');
+      if (mobNav) mobNav.classList.add('hidden');
+
+      syncAdminControlsVisibility();
+      renderRxQueue();
+      renderDrugCompendium();
+
+      const tabs = ['dashboard', 'prescriptions', 'monographs', 'interactions', 'healthtips', 'blueprint'];
+      tabs.forEach(t => {
+        const view = document.getElementById('view-' + t);
+        if (view) {
+          if (t === 'blueprint') view.classList.remove('hidden');
+          else view.classList.add('hidden');
+        }
+      });
+
+      filterAdminDesk(activeAdminDeskFilter || 'ALL');
+      try {
+        if (window.location.hash !== '#/admin') {
+          window.history.replaceState(null, '', '#/admin');
+        }
+      } catch (_) {}
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function exitAdminPortal() {
+      isAdminAuthenticated = false;
+      isAdminPortalActive = false;
+      try {
+        sessionStorage.removeItem('pbp_admin_auth');
+      } catch (_) {}
+      const patientHdr = document.getElementById('patientHeaderBar');
+      const adminHdr = document.getElementById('adminHeaderBar');
+      const mobNav = document.getElementById('mobileBottomNav');
+      if (adminHdr) adminHdr.classList.add('hidden');
+      if (patientHdr) patientHdr.classList.remove('hidden');
+      if (mobNav) mobNav.classList.remove('hidden');
+
+      syncAdminControlsVisibility();
+      renderRxQueue();
+      renderDrugCompendium();
+      switchTab('dashboard');
+      showToast('Backend Console locked — Returned to Patient Companion PWA.');
+    }
+
+    function filterAdminDesk(deskKey) {
+      activeAdminDeskFilter = deskKey || 'ALL';
+      const desks = ['ALL', 'dispensing', 'crypto', 'bridge', 'selftest'];
+      desks.forEach(k => {
+        const btn = document.getElementById('adminDeskBtn-' + k);
+        if (!btn) return;
+        if (k === activeAdminDeskFilter) {
+          btn.className = 'admin-desk-btn px-3 py-1.5 rounded-full font-bold bg-cyan-500 text-slate-950 whitespace-nowrap flex items-center gap-1.5 transition';
+        } else {
+          btn.className = 'admin-desk-btn px-3 py-1.5 rounded-full font-medium text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap flex items-center gap-1.5 transition';
+        }
+      });
+
+      const dispensingEl = document.getElementById('adminDesk-dispensing');
+      const cryptoEl = document.getElementById('adminDesk-crypto');
+      const devopsEl = document.getElementById('adminDesk-devops');
+      const bridgeEl = document.getElementById('adminDesk-bridge');
+      const selftestEl = document.getElementById('adminDesk-selftest');
+
+      if (activeAdminDeskFilter === 'ALL') {
+        if (dispensingEl) { dispensingEl.classList.remove('hidden'); dispensingEl.className = 'admin-desk-section lg:col-span-7 bg-white rounded-2xl shadow-sm border-2 border-slate-200 p-5 space-y-4'; }
+        if (cryptoEl) { cryptoEl.classList.remove('hidden'); cryptoEl.className = 'admin-desk-section lg:col-span-5 space-y-5'; }
+        if (devopsEl) devopsEl.classList.remove('hidden');
+        if (bridgeEl) bridgeEl.classList.remove('hidden');
+        if (selftestEl) selftestEl.classList.remove('hidden');
+      } else if (activeAdminDeskFilter === 'dispensing') {
+        if (dispensingEl) { dispensingEl.classList.remove('hidden'); dispensingEl.className = 'admin-desk-section lg:col-span-12 bg-white rounded-2xl shadow-sm border-2 border-slate-200 p-5 space-y-4'; }
+        if (cryptoEl) cryptoEl.classList.add('hidden');
+        if (devopsEl) devopsEl.classList.add('hidden');
+      } else if (activeAdminDeskFilter === 'crypto') {
+        if (dispensingEl) dispensingEl.classList.add('hidden');
+        if (cryptoEl) { cryptoEl.classList.remove('hidden'); cryptoEl.className = 'admin-desk-section lg:col-span-12 space-y-5'; }
+        if (devopsEl) devopsEl.classList.add('hidden');
+      } else if (activeAdminDeskFilter === 'bridge') {
+        if (dispensingEl) dispensingEl.classList.add('hidden');
+        if (cryptoEl) cryptoEl.classList.add('hidden');
+        if (devopsEl) devopsEl.classList.remove('hidden');
+        if (bridgeEl) bridgeEl.classList.remove('hidden');
+        if (selftestEl) selftestEl.classList.add('hidden');
+      } else if (activeAdminDeskFilter === 'selftest') {
+        if (dispensingEl) dispensingEl.classList.add('hidden');
+        if (cryptoEl) cryptoEl.classList.add('hidden');
+        if (devopsEl) devopsEl.classList.remove('hidden');
+        if (bridgeEl) bridgeEl.classList.add('hidden');
+        if (selftestEl) selftestEl.classList.remove('hidden');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
     function resolveTabAlias(rawId) {
-      const clean = String(rawId || '').toLowerCase().trim();
+      const clean = String(rawId || '').toLowerCase().replace(/^\/+/, '').trim();
       const aliasMap = {
         alarms: 'dashboard',
         rx: 'prescriptions',
@@ -2833,13 +3221,34 @@ jobs:
         safety: 'interactions',
         vitals: 'healthtips',
         antigravity: 'blueprint',
-        cloud: 'blueprint'
+        cloud: 'blueprint',
+        admin: 'blueprint',
+        staff: 'blueprint'
       };
       return aliasMap[clean] || clean;
     }
 
     function handleHashShortcutNavigation() {
-      const hash = resolveTabAlias((window.location.hash || '').replace('#', ''));
+      const rawHash = (window.location.hash || '').replace('#', '').toLowerCase().trim();
+      const urlParams = new URLSearchParams(window.location.search || '');
+      const wantsAdmin = rawHash === '/admin' || rawHash === 'admin' || rawHash === 'staff' || urlParams.get('portal') === 'admin';
+      if (wantsAdmin) {
+        let savedAuth = false;
+        try { savedAuth = sessionStorage.getItem('pbp_admin_auth') === '1'; } catch (_) {}
+        if (isAdminAuthenticated || savedAuth) {
+          const savedRole = sessionStorage.getItem('pbp_admin_role');
+          if (savedRole) {
+            const rb = document.getElementById('adminActiveRoleBadge');
+            if (rb) rb.textContent = savedRole;
+          }
+          activateAdminBackendView();
+        } else {
+          openAdminPortalTrigger();
+        }
+        return;
+      }
+
+      const hash = resolveTabAlias(rawHash);
       const validTabs = ['dashboard', 'prescriptions', 'monographs', 'interactions', 'healthtips', 'blueprint'];
       if (validTabs.includes(hash)) {
         switchTab(hash);
@@ -2908,6 +3317,22 @@ jobs:
       const tabs = ['dashboard', 'prescriptions', 'monographs', 'interactions', 'healthtips', 'blueprint'];
       if (!tabs.includes(tabId)) return;
 
+      if (tabId === 'blueprint') {
+        activateAdminBackendView();
+        return;
+      }
+
+      // Switching to a Patient Tab restores the Superlight Patient Header if currently in Admin Portal
+      if (isAdminPortalActive) {
+        isAdminPortalActive = false;
+        const patientHdr = document.getElementById('patientHeaderBar');
+        const adminHdr = document.getElementById('adminHeaderBar');
+        const mobNav = document.getElementById('mobileBottomNav');
+        if (adminHdr) adminHdr.classList.add('hidden');
+        if (patientHdr) patientHdr.classList.remove('hidden');
+        if (mobNav) mobNav.classList.remove('hidden');
+      }
+
       tabs.forEach(t => {
         const view = document.getElementById('view-' + t);
         const btn = document.getElementById('tabBtn-' + t);
@@ -2915,7 +3340,7 @@ jobs:
         if (t === tabId) {
           if (view) view.classList.remove('hidden');
           if (btn) {
-            btn.className = 'nav-tab-btn px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 bg-blue-900 text-white shadow-2xs transition' + (t === 'blueprint' ? ' ml-auto' : '');
+            btn.className = 'nav-tab-btn px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 bg-blue-900 text-white shadow-2xs transition' + (t === 'blueprint' ? ' hidden ml-auto' : '');
           }
           if (mobBtn) {
             mobBtn.className = 'flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl text-blue-900 font-bold';
@@ -2923,7 +3348,7 @@ jobs:
         } else {
           if (view) view.classList.add('hidden');
           if (btn) {
-            btn.className = 'nav-tab-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition' + (t === 'blueprint' ? ' ml-auto' : '');
+            btn.className = 'nav-tab-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition' + (t === 'blueprint' ? ' hidden ml-auto' : '');
           }
           if (mobBtn) {
             mobBtn.className = 'flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl text-slate-500';
@@ -3016,13 +3441,13 @@ jobs:
     const QUICK_COMMANDS = [
       { id: 'cmd-add-alarm', title: '+ Add New Medication Alarm', subtitle: 'Schedule intake reminder & stock tracking', shortcut: 'N', icon: 'bell-plus', run: () => { switchTab('dashboard'); openAddMedModal(); } },
       { id: 'cmd-search-catalog', title: 'Search 8,271 Pharmacy Catalog & Prices', subtitle: 'Jump to VINDATA ERP catalog & INN filter', shortcut: '/', icon: 'search', run: () => { switchTab('monographs'); setCompendiumTabMode('trade'); setTimeout(() => { const el = document.getElementById('tradeSearchInput'); if (el) el.focus(); }, 60); } },
-      { id: 'cmd-upload-rx', title: 'Upload & Encrypt Prescription (AES-256-GCM)', subtitle: 'Client-side redaction & SOP-RH-FP-03 Pharmacist Queue', shortcut: 'U', icon: 'file-lock-2', run: () => { switchTab('prescriptions'); } },
+      { id: 'cmd-upload-rx', title: 'Upload & Encrypt Prescription (AES-256-GCM)', subtitle: 'Client-side redaction & Live Preparation Tracker', shortcut: 'U', icon: 'file-lock-2', run: () => { switchTab('prescriptions'); } },
       { id: 'cmd-check-interactions', title: 'Check Polypharmacy Drug Interactions', subtitle: 'Drug-drug & pregnancy/renal contraindication checker', shortcut: 'I', icon: 'shield-alert', run: () => { switchTab('interactions'); } },
       { id: 'cmd-vitals', title: 'Log Blood Pressure & Fasting Glucose', subtitle: 'Chronic biomarker chart & disease-state tips', shortcut: '5', icon: 'heart-pulse', run: () => { switchTab('healthtips'); } },
       { id: 'cmd-test-alarm', title: 'Trigger Test Medication Alarm Chime', subtitle: 'Test C5-E5-G5 clinical triad & notification overlay', shortcut: 'T', icon: 'bell-ring', run: () => { triggerTestAlarm(); } },
-      { id: 'cmd-self-test', title: 'Run 8-Point Clinical & Crypto Self-Test', subtitle: 'Verify IndexedDB, AES-GCM, SOP-RH-FP-03 & Fapshi Bridge', shortcut: '6', icon: 'check-circle-2', run: () => { switchTab('blueprint'); runFullComplianceSelfTest(); } },
       { id: 'cmd-care-plus', title: 'Upgrade / Manage Bleue Plus Care+ VIP (Fapshi MoMo)', subtitle: 'Unlock family profiles & unlimited alarms (2,500 FCFA)', shortcut: 'VIP', icon: 'sparkles', run: () => { openTierModal(); } },
-      { id: 'cmd-lang', title: 'Switch Interface Language (EN / FR)', subtitle: 'Toggle bilingual clinical interface', shortcut: 'L', icon: 'languages', run: () => { toggleLanguage(); } }
+      { id: 'cmd-lang', title: 'Switch Interface Language (EN / FR)', subtitle: 'Toggle bilingual clinical interface', shortcut: 'L', icon: 'languages', run: () => { toggleLanguage(); } },
+      { id: 'cmd-admin-portal', title: '🔒 Ngousso Staff & Technical Admin Console (#/admin)', subtitle: 'SOP-RH-FP-03 Visa Queue, Web Crypto Telemetry & 8-Phase Self-Test', shortcut: 'Ctrl+Shift+A', icon: 'shield-check', run: () => { openAdminPortalTrigger(); } }
     ];
 
     function openCommandPalette(initialQuery) {
@@ -3066,6 +3491,7 @@ jobs:
       closeAddMedModal();
       closeTierModal();
       closeAdrReportModal();
+      if (typeof closeAdminAuthModal === 'function') closeAdminAuthModal();
       if (typeof closePharmacistVisaModal === 'function') closePharmacistVisaModal();
       if (typeof closeMonographModal === 'function') closeMonographModal();
       if (typeof closeTradeMonographDetailModal === 'function') closeTradeMonographDetailModal();
@@ -3208,6 +3634,13 @@ jobs:
         return;
       }
 
+      // 1b. Ctrl+Shift+A opens/toggles the Ngousso Staff & Admin Backend Portal (#/admin)
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'a') {
+        event.preventDefault();
+        openAdminPortalTrigger();
+        return;
+      }
+
       // 2. Escape anywhere closes any open modal
       if (event.key === 'Escape') {
         closeAllModals();
@@ -3225,7 +3658,7 @@ jobs:
       else if (key === '3') { event.preventDefault(); switchTab('monographs'); }
       else if (key === '4' || key.toLowerCase() === 'i') { event.preventDefault(); switchTab('interactions'); }
       else if (key === '5') { event.preventDefault(); switchTab('healthtips'); }
-      else if (key === '6') { event.preventDefault(); switchTab('blueprint'); }
+      else if (key === '6') { event.preventDefault(); openAdminPortalTrigger(); }
       else if (key === '/' || key.toLowerCase() === 's') {
         event.preventDefault();
         switchTab('monographs');
@@ -4399,92 +4832,135 @@ jobs:
     }
 
     function renderRxQueue() {
-      const container = document.getElementById('rxQueueContainer');
+      const patientContainer = document.getElementById('rxQueueContainer');
+      const adminContainer = document.getElementById('adminRxQueueContainer');
       const stageLabels = [
         '1. Encrypted Upload',
         '2. Aux Prep (VINDATA)',
         '3. Pharmacist Visa',
         '4. Ready at Ngousso'
       ];
-      container.innerHTML = rxQueue.map(rx => {
-        const conflicts = auditPrescriptionContraindications(rx);
-        const hasUnresolvedConflict = conflicts.length > 0 && rx.stage < 3;
 
-        const cryptoMeta = rx.sha256
-          ? `<div class="bg-slate-900 text-cyan-300 font-mono text-[10px] px-2.5 py-1.5 rounded-lg flex flex-wrap items-center justify-between gap-2">
-               <span>SHA-256: ${rx.sha256.slice(0, 16)}... • IV: ${rx.ivHex || 'N/A'}</span>
-               <button onclick="verifyDecryptionRoundTrip('${rx.id}')" class="text-emerald-400 hover:underline font-bold">Verify Decrypt ↺</button>
-             </div>`
-          : '';
+      // 1. Render Clean, Reassuring Patient Status Tracker (#rxQueueContainer in Tab 2)
+      if (patientContainer) {
+        patientContainer.innerHTML = rxQueue.map(rx => {
+          const counselingNoteHtml = rx.interventionNote
+            ? `<div class="p-2.5 rounded-xl bg-blue-50/80 border border-blue-200 text-[11px] text-blue-950">
+                 <strong class="block text-blue-900">Pharmacist Clinical Counseling Note:</strong>
+                 <span>${rx.interventionNote}</span>
+               </div>`
+            : '';
 
-        const conflictBanner = hasUnresolvedConflict
-          ? `<div class="p-2 rounded-lg bg-rose-50 border border-rose-200 text-[11px] text-rose-900 font-semibold flex items-center justify-between gap-2">
-               <span>⚠️ Flagged: ${conflicts[0].drugs.join(' + ')} (${conflicts[0].severity})</span>
-               <span class="text-[10px] uppercase bg-rose-600 text-white px-2 py-0.5 rounded font-bold shrink-0">Requires SOP-RH-FP-03 Override</span>
-             </div>`
-          : '';
+          const statusPill = rx.stage >= 4
+            ? `<span class="text-emerald-800 font-extrabold bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-full text-[10px]">✓ Ready at Ngousso Counter</span>`
+            : `<span class="text-blue-900 font-bold bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full text-[10px]">Stage ${rx.stage}/4 In Progress</span>`;
 
-        const visaSigBadge = rx.visaSignature
-          ? `<div class="text-[10px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center justify-between">
-               <span>ONPC Visa Token: ${rx.visaSignature.slice(0, 24)}...</span>
-               <span class="font-bold">✓ Law 90/035 Verified</span>
-             </div>`
-          : '';
-
-        const auditTrailHtml = Array.isArray(rx.auditLog) && rx.auditLog.length > 0
-          ? `<details class="text-[11px] bg-white rounded-lg border border-slate-200 px-3 py-1.5">
-               <summary class="font-bold text-slate-700 cursor-pointer select-none flex items-center justify-between">
-                 <span>SOP-RH-FP-03 Regulatory Audit Trail (${rx.auditLog.length} steps)</span>
-                 <span class="text-[10px] font-mono text-slate-400">${rx.stageCode || ''}</span>
-               </summary>
-               <div class="mt-2 space-y-1.5 border-t border-slate-100 pt-2">
-                 ${rx.auditLog.map(log => `
-                   <div class="text-[10px] leading-snug">
-                     <span class="font-mono font-bold text-blue-900">[${log.time} • ${log.code}]</span>
-                     <strong class="text-slate-800">${log.actor}:</strong>
-                     <span class="text-slate-600">${log.note}</span>
-                   </div>
-                 `).join('')}
-               </div>
-             </details>`
-          : '';
-
-        let nextActionBtn = '';
-        if (rx.stage === 1) {
-          nextActionBtn = `<button onclick="advanceRxStage('${rx.id}')" class="bg-blue-900 hover:bg-blue-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shrink-0">Step 2: Aux VINDATA Prep →</button>`;
-        } else if (rx.stage === 2) {
-          nextActionBtn = `<button onclick="openPharmacistVisaModal('${rx.id}')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-[11px] font-extrabold px-3 py-1.5 rounded-lg shadow-sm transition shrink-0">Sign Pharmacist Visa (SOP-RH-FP-03) →</button>`;
-        } else if (rx.stage === 3) {
-          nextActionBtn = `<button onclick="advanceRxStage('${rx.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-sm transition shrink-0">Release to Counter (Stage 4) →</button>`;
-        } else {
-          nextActionBtn = `<span class="text-emerald-700 font-extrabold bg-emerald-100 px-2.5 py-1 rounded-lg">✓ Dispensing Ready</span>`;
-        }
-
-        return `
-          <div class="p-4 rounded-xl border ${hasUnresolvedConflict ? 'border-rose-300 bg-rose-50/20' : 'border-slate-200 bg-slate-50'} space-y-2.5">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-black font-mono text-blue-900">${rx.id}</span>
-              <span class="text-[11px] font-semibold text-slate-500">${rx.date}</span>
+          return `
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/80 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-black font-mono text-blue-900">${rx.id}</span>
+                <span class="text-[11px] font-semibold text-slate-500">${rx.date}</span>
+              </div>
+              <p class="text-xs font-bold text-slate-800">${rx.items}</p>
+              <p class="text-[11px] text-slate-500">${rx.mode} • <strong>${rx.payment}</strong></p>
+              <div class="grid grid-cols-4 gap-1 pt-1">
+                ${stageLabels.map((lbl, idx) => {
+                  const active = (idx + 1) <= rx.stage;
+                  return `<div class="text-[10px] font-bold px-1.5 py-1 rounded text-center ${active ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500'}">${lbl}</div>`;
+                }).join('')}
+              </div>
+              ${counselingNoteHtml}
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/80 text-[11px]">
+                <span class="font-semibold ${rx.stage >= 3 ? 'text-emerald-700' : 'text-slate-600'}">${rx.pharmacistVisa}</span>
+                ${statusPill}
+              </div>
             </div>
-            <p class="text-xs font-bold text-slate-800">${rx.items}</p>
-            <p class="text-[11px] text-slate-500">${rx.mode} • <strong>${rx.payment}</strong></p>
-            ${cryptoMeta}
-            ${conflictBanner}
-            ${visaSigBadge}
-            <div class="grid grid-cols-4 gap-1 pt-1">
-              ${stageLabels.map((lbl, idx) => {
-                const active = (idx + 1) <= rx.stage;
-                return `<div class="text-[10px] font-bold px-1.5 py-1 rounded text-center ${active ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500'}">${lbl}</div>`;
-              }).join('')}
+          `;
+        }).join('');
+      }
+
+      // 2. Render Full Staff SOP-RH-FP-03 Validation & Cryptographic Queue (#adminRxQueueContainer in Admin Desk 1)
+      if (adminContainer) {
+        adminContainer.innerHTML = rxQueue.map(rx => {
+          const conflicts = auditPrescriptionContraindications(rx);
+          const hasUnresolvedConflict = conflicts.length > 0 && rx.stage < 3;
+
+          const cryptoMeta = rx.sha256
+            ? `<div class="bg-slate-900 text-cyan-300 font-mono text-[10px] px-2.5 py-1.5 rounded-lg flex flex-wrap items-center justify-between gap-2">
+                 <span>SHA-256: ${rx.sha256.slice(0, 16)}... • IV: ${rx.ivHex || 'N/A'}</span>
+                 <button onclick="verifyDecryptionRoundTrip('${rx.id}')" class="text-emerald-400 hover:underline font-bold">Verify Decrypt ↺</button>
+               </div>`
+            : '';
+
+          const conflictBanner = hasUnresolvedConflict
+            ? `<div class="p-2 rounded-lg bg-rose-50 border border-rose-200 text-[11px] text-rose-900 font-semibold flex items-center justify-between gap-2">
+                 <span>⚠️ Flagged: ${conflicts[0].drugs.join(' + ')} (${conflicts[0].severity})</span>
+                 <span class="text-[10px] uppercase bg-rose-600 text-white px-2 py-0.5 rounded font-bold shrink-0">Requires SOP-RH-FP-03 Override</span>
+               </div>`
+            : '';
+
+          const visaSigBadge = rx.visaSignature
+            ? `<div class="text-[10px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center justify-between">
+                 <span>ONPC Visa Token: ${rx.visaSignature.slice(0, 24)}...</span>
+                 <span class="font-bold">✓ Law 90/035 Verified</span>
+               </div>`
+            : '';
+
+          const auditTrailHtml = Array.isArray(rx.auditLog) && rx.auditLog.length > 0
+            ? `<details class="text-[11px] bg-white rounded-lg border border-slate-200 px-3 py-1.5">
+                 <summary class="font-bold text-slate-700 cursor-pointer select-none flex items-center justify-between">
+                   <span>SOP-RH-FP-03 Regulatory Audit Trail (${rx.auditLog.length} steps)</span>
+                   <span class="text-[10px] font-mono text-slate-400">${rx.stageCode || ''}</span>
+                 </summary>
+                 <div class="mt-2 space-y-1.5 border-t border-slate-100 pt-2">
+                   ${rx.auditLog.map(log => `
+                     <div class="text-[10px] leading-snug">
+                       <span class="font-mono font-bold text-blue-900">[${log.time} • ${log.code}]</span>
+                       <strong class="text-slate-800">${log.actor}:</strong>
+                       <span class="text-slate-600">${log.note}</span>
+                     </div>
+                   `).join('')}
+                 </div>
+               </details>`
+            : '';
+
+          let nextActionBtn = '';
+          if (rx.stage === 1) {
+            nextActionBtn = `<button onclick="advanceRxStage('${rx.id}')" class="bg-blue-900 hover:bg-blue-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shrink-0">Step 2: Aux VINDATA Prep →</button>`;
+          } else if (rx.stage === 2) {
+            nextActionBtn = `<button onclick="openPharmacistVisaModal('${rx.id}')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-[11px] font-extrabold px-3 py-1.5 rounded-lg shadow-sm transition shrink-0">Sign Pharmacist Visa (SOP-RH-FP-03) →</button>`;
+          } else if (rx.stage === 3) {
+            nextActionBtn = `<button onclick="advanceRxStage('${rx.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-sm transition shrink-0">Release to Counter (Stage 4) →</button>`;
+          } else {
+            nextActionBtn = `<span class="text-emerald-700 font-extrabold bg-emerald-100 px-2.5 py-1 rounded-lg">✓ Dispensing Ready</span>`;
+          }
+
+          return `
+            <div class="p-4 rounded-xl border ${hasUnresolvedConflict ? 'border-rose-300 bg-rose-50/20' : 'border-slate-200 bg-slate-50'} space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-black font-mono text-blue-900">${rx.id}</span>
+                <span class="text-[11px] font-semibold text-slate-500">${rx.date}</span>
+              </div>
+              <p class="text-xs font-bold text-slate-800">${rx.items}</p>
+              <p class="text-[11px] text-slate-500">${rx.mode} • <strong>${rx.payment}</strong></p>
+              ${cryptoMeta}
+              ${conflictBanner}
+              ${visaSigBadge}
+              <div class="grid grid-cols-4 gap-1 pt-1">
+                ${stageLabels.map((lbl, idx) => {
+                  const active = (idx + 1) <= rx.stage;
+                  return `<div class="text-[10px] font-bold px-1.5 py-1 rounded text-center ${active ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500'}">${lbl}</div>`;
+                }).join('')}
+              </div>
+              ${auditTrailHtml}
+              <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/80 text-[11px]">
+                <span class="font-semibold ${rx.stage >= 3 ? 'text-emerald-700' : 'text-amber-800'}">${rx.pharmacistVisa}</span>
+                ${nextActionBtn}
+              </div>
             </div>
-            ${auditTrailHtml}
-            <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/80 text-[11px]">
-              <span class="font-semibold ${rx.stage >= 3 ? 'text-emerald-700' : 'text-amber-800'}">${rx.pharmacistVisa}</span>
-              ${nextActionBtn}
-            </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
     }
 
     // --- TAB 3: CLINICAL PHARMACOLOGY DRUG COMPENDIUM & DYNAMIC FORMULARY ENGINE ---
@@ -4528,7 +5004,7 @@ jobs:
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = '<div class="col-span-2 bg-white rounded-2xl p-8 text-center text-sm text-slate-500 border border-slate-200">No drug monographs match your search filter. Click <strong>"+ Add Clinical Monograph"</strong> above to add a new molecule.</div>';
+        grid.innerHTML = '<div class="col-span-2 bg-white rounded-2xl p-8 text-center text-sm text-slate-500 border border-slate-200">No drug monographs match your search filter.</div>';
         return;
       }
 
@@ -4554,7 +5030,7 @@ jobs:
               </div>
               <div class="flex flex-col items-end gap-1.5 shrink-0">
                 <span class="text-[11px] font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">${d.refPrice || 'PGO Reference'}</span>
-                <div class="flex items-center gap-1">
+                <div class="admin-only-control ${isAdminAuthenticated ? 'flex' : 'hidden'} items-center gap-1">
                   <button onclick="openMonographModal('${safeDci}')" class="text-[11px] font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-lg transition flex items-center gap-1" title="Customize or edit this clinical monograph">
                     <i data-lucide="edit-3" class="w-3 h-3"></i> Edit
                   </button>
@@ -5829,10 +6305,10 @@ jobs:
       if (rxTabBadge) {
         if (status.isLive) {
           rxTabBadge.textContent = `Supabase Bridge: LIVE_REST (${outboxCount} Synced/Staged)`;
-          rxTabBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 transition";
+          rxTabBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-600 hover:bg-emerald-900 transition";
         } else {
           rxTabBadge.textContent = `Supabase Bridge: LOCAL_MOCK_VAULT (${outboxCount} Staged)`;
-          rxTabBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-cyan-50 text-cyan-800 border border-cyan-200 hover:bg-cyan-100 transition";
+          rxTabBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-700 hover:bg-cyan-900 transition";
         }
       }
     }
