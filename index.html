@@ -88,9 +88,9 @@
     <div class="max-w-7xl mx-auto px-4 pt-2.5 pb-2 flex flex-col gap-2.5">
       <!-- Top Row: Brand + Google Omni-Search Spotlight Pill + Compact Utility Actions -->
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <!-- Brand Identity -->
+        <!-- Brand Identity (Discreet Triple-Click on Medical Cross activates Admin Portal) -->
         <div class="flex items-center gap-2.5">
-          <div onclick="switchTab('dashboard')" class="cursor-pointer w-9 h-9 rounded-xl bg-gradient-to-br from-blue-900 to-cyan-600 flex items-center justify-center shadow-sm hover:scale-105 transition">
+          <div id="headerBrandLogo" onclick="handleBrandLogoClick()" title="Pharmacie Bleue Plus" class="cursor-pointer w-9 h-9 rounded-xl bg-gradient-to-br from-blue-900 to-cyan-600 flex items-center justify-center shadow-sm hover:scale-105 transition">
             <i data-lucide="cross" class="w-5 h-5 text-white"></i>
           </div>
           <div>
@@ -123,6 +123,47 @@
             <span id="offlineStatusDot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span id="offlineStatusText" class="hidden xl:inline">Offline Vault Ready</span>
           </button>
+
+          <!-- Patient User Account Trigger / Dropdown -->
+          <div class="relative">
+            <button id="userAuthBtn" onclick="handleUserAuthBtnClick()" class="inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 px-2.5 py-1.5 rounded-full border border-blue-200/90 text-xs font-semibold shadow-2xs transition" title="Mon Compte Patient / Se connecter">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-cyan-600"></i>
+              <span id="userAuthBtnLabel" class="hidden sm:inline">Connexion</span>
+              <i id="userAuthChevron" data-lucide="chevron-down" class="w-3 h-3 text-slate-400 hidden"></i>
+            </button>
+
+            <!-- Logged-in User Dropdown Menu -->
+            <div id="userAccountDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 py-2.5 px-3 z-50 text-xs space-y-2">
+              <div class="border-b border-slate-100 pb-2">
+                <p class="font-extrabold text-slate-900 truncate" id="userMenuName">Patient Bleue Plus</p>
+                <p class="text-[11px] text-slate-500 truncate" id="userMenuEmail">patient@example.cm</p>
+                <div class="mt-1 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span class="text-[10px] font-semibold text-emerald-700" id="userMenuSyncStatus">Connecté (Session Active)</span>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <button onclick="openTierModal(); toggleUserAccountDropdown();" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-amber-50 text-slate-700 hover:text-amber-900 flex items-center justify-between">
+                  <span>Statut Formule :</span>
+                  <span id="userMenuTierBadge" class="font-bold text-amber-700">Care+ VIP</span>
+                </button>
+                <button onclick="switchTab('prescriptions'); toggleUserAccountDropdown();" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700 flex items-center gap-2">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5 text-cyan-600"></i>
+                  <span>Mes ordonnances chiffrées</span>
+                </button>
+                <button onclick="switchTab('dashboard'); toggleUserAccountDropdown();" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700 flex items-center gap-2">
+                  <i data-lucide="bell" class="w-3.5 h-3.5 text-cyan-600"></i>
+                  <span>Mes rappels de prise</span>
+                </button>
+              </div>
+              <div class="border-t border-slate-100 pt-1.5">
+                <button onclick="handleUserSignOut()" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-rose-50 text-rose-600 font-bold flex items-center gap-2">
+                  <i data-lucide="log-out" class="w-3.5 h-3.5 text-rose-500"></i>
+                  <span>Se déconnecter</span>
+                </button>
+              </div>
+            </div>
+          </div>
 
           <!-- Active Patient Profile Selector (Care+ Feature) -->
           <div class="relative">
@@ -253,6 +294,10 @@
         <button onclick="filterAdminDesk('selftest')" id="adminDeskBtn-selftest" class="admin-desk-btn px-3 py-1.5 rounded-full font-medium text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap flex items-center gap-1.5 transition">
           <i data-lucide="terminal" class="w-3.5 h-3.5 text-indigo-400"></i>
           <span>4. 8-Phase Self-Test &amp; DevOps Kit</span>
+        </button>
+        <button onclick="filterAdminDesk('staff')" id="adminDeskBtn-staff" class="admin-desk-btn px-3 py-1.5 rounded-full font-medium text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap flex items-center gap-1.5 transition">
+          <i data-lucide="users" class="w-3.5 h-3.5 text-pink-400"></i>
+          <span>5. Staff &amp; Admin Access Control</span>
         </button>
       </nav>
     </div>
@@ -1457,6 +1502,123 @@ jobs:
             </div>
           </div>
         </div>
+
+        <!-- Admin Desk 5: Staff & Admin Credentials Manager -->
+        <div id="adminDesk-staff" class="admin-desk-section bg-white rounded-2xl border-2 border-pink-200 p-5 shadow-sm flex flex-col gap-5 lg:col-span-2">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <i data-lucide="users" class="w-5 h-5 text-pink-600"></i>
+                <h3 class="text-base font-extrabold text-slate-900">Admin Desk 5 • Staff &amp; Admin Access Control &amp; Roster Manager</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">
+                Configure authorized pharmacists, assistants, and technical admins with Cameroon ONPC matricules and secure access PINs. Stored safely in local vault (<code>pbp_admin_roster</code>).
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="resetAdminRosterToDefault(true)" class="text-xs font-semibold text-slate-500 hover:text-rose-600 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition">
+                Reset Defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Staff Roster Table -->
+          <div class="space-y-2">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+              <i data-lucide="shield" class="w-3.5 h-3.5 text-cyan-600"></i>
+              <span>Active Pharmacist &amp; Admin Staff Roster</span>
+            </h4>
+            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold">
+                  <tr>
+                    <th class="py-2.5 px-3">Collaborateur / Nom</th>
+                    <th class="py-2.5 px-3">Rôle / Titre</th>
+                    <th class="py-2.5 px-3">Matricule ONPC</th>
+                    <th class="py-2.5 px-3">Code PIN</th>
+                    <th class="py-2.5 px-3">Statut</th>
+                    <th class="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminStaffTableBody" class="divide-y divide-slate-100 text-slate-700">
+                  <!-- Populated dynamically via renderAdminStaffTable() -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Add New Staff Form & Self PIN Change Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Card 1: Add New Staff Member -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+              <h5 class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="user-plus" class="w-4 h-4 text-emerald-600"></i>
+                <span>Ajouter un Pharmacien / Collaborateur</span>
+              </h5>
+              <form id="addStaffForm" onsubmit="handleAddNewStaff(event)" class="space-y-2.5 text-xs">
+                <div>
+                  <label class="block font-semibold text-slate-700 mb-1">Nom et Prénom *</label>
+                  <input type="text" id="newStaffName" placeholder="ex: Dr. Akono Marie" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Rôle *</label>
+                    <select id="newStaffRole" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-cyan-500">
+                      <option value="Pharmacist Assistant">Pharmacien Assistant</option>
+                      <option value="Chief Pharmacist">Pharmacien Titulaire</option>
+                      <option value="Intern Pharmacist">Pharmacien Stagiaire</option>
+                      <option value="Dispensing Technician">Préparateur en Pharmacie</option>
+                      <option value="System Administrator">Administrateur IT</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Code PIN (min 4 ch.) *</label>
+                    <input type="password" id="newStaffPin" placeholder="ex: 7890" maxlength="8" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 font-mono focus:ring-2 focus:ring-cyan-500">
+                  </div>
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-700 mb-1">Matricule ONPC ou Réf. Service</label>
+                  <input type="text" id="newStaffOnpc" placeholder="ex: ONPC Section A N° 2341" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg transition flex items-center justify-center gap-1.5 shadow-2xs">
+                  <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                  <span>Enregistrer le Collaborateur</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Card 2: Quick Modify Current Master PIN -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+              <h5 class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+                <i data-lucide="key" class="w-4 h-4 text-amber-600"></i>
+                <span>Modifier Mon Code PIN Actuel</span>
+              </h5>
+              <form id="changeSelfPinForm" onsubmit="handleChangeSelfPin(event)" class="space-y-2.5 text-xs">
+                <div>
+                  <label class="block font-semibold text-slate-700 mb-1">Ancien Code PIN *</label>
+                  <input type="password" id="oldMasterPin" placeholder="PIN actuel (ex: 2026 ou 1184)" maxlength="8" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 font-mono focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nouveau PIN *</label>
+                    <input type="password" id="newMasterPin" placeholder="Nouveau (4-8 ch.)" maxlength="8" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 font-mono focus:ring-2 focus:ring-cyan-500">
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Confirmer PIN *</label>
+                    <input type="password" id="confirmMasterPin" placeholder="Répéter PIN" maxlength="8" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 font-mono focus:ring-2 focus:ring-cyan-500">
+                  </div>
+                </div>
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded-lg transition flex items-center justify-center gap-1.5 shadow-2xs">
+                  <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                  <span>Mettre à jour mon PIN</span>
+                </button>
+              </form>
+              <p class="text-[11px] text-slate-500">
+                Note de sécurité : Toute modification de code PIN prend effet immédiatement pour toutes les sessions suivantes.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1979,8 +2141,8 @@ jobs:
           <span class="flex gap-1"><kbd class="kbd-pill">/</kbd> <span class="text-slate-400">or</span> <kbd class="kbd-pill">S</kbd></span>
         </div>
         <div class="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-slate-50">
-          <span class="font-medium text-slate-700">Switch Tabs (Alarms → Cloud Kit)</span>
-          <span class="flex gap-1"><kbd class="kbd-pill">1</kbd> – <kbd class="kbd-pill">6</kbd></span>
+          <span class="font-medium text-slate-700">Switch Tabs (Alarms → Health Tips)</span>
+          <span class="flex gap-1"><kbd class="kbd-pill">1</kbd> – <kbd class="kbd-pill">5</kbd></span>
         </div>
         <div class="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-slate-50">
           <span class="font-medium text-slate-700">New Medication Alarm Modal</span>
@@ -2001,10 +2163,6 @@ jobs:
         <div class="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-slate-50">
           <span class="font-medium text-slate-700">Close Any Active Modal</span>
           <kbd class="kbd-pill">Esc</kbd>
-        </div>
-        <div class="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-slate-900 text-slate-200">
-          <span class="font-medium text-cyan-300">Ngousso Staff &amp; Admin Console (#/admin)</span>
-          <kbd class="kbd-pill bg-slate-800 text-cyan-300 border-slate-700">Ctrl Shift A</kbd>
         </div>
       </div>
       <div class="flex justify-end pt-2 border-t border-slate-100">
@@ -2039,20 +2197,18 @@ jobs:
         <div>
           <label for="adminRoleSelect" class="block font-bold text-slate-300 mb-1">Authenticated Staff / Architect Identity *</label>
           <select id="adminRoleSelect" class="w-full rounded-xl bg-slate-950 border border-slate-700 text-white px-3 py-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-cyan-500">
-            <option value="Dr. Chiabi Roland — Assistant (ONPC Section A N° 1184)">Dr. Chiabi Roland — Assistant (ONPC Section A N° 1184)</option>
-            <option value="Dr. Titulaire Bleue Plus — Titulaire (ONPC Section A N° 0492)">Dr. Titulaire Bleue Plus — Titulaire (ONPC Section A N° 0492)</option>
-            <option value="System Architect &amp; DevOps Admin (Ngousso Telemetry)">System Architect &amp; DevOps Admin (Ngousso Telemetry)</option>
+            <!-- Populated dynamically via populateAdminRoleSelect() -->
           </select>
         </div>
 
         <div>
           <div class="flex items-center justify-between mb-1">
             <label for="adminPinInput" class="font-bold text-slate-300">ONPC Staff Security PIN / Passcode *</label>
-            <span class="text-[10px] font-mono text-cyan-400">Demo PIN: 2026 or 1184</span>
+            <span id="adminAuthHint" class="text-[10px] font-mono text-cyan-400">PIN: 2026 / 1184</span>
           </div>
-          <input type="password" id="adminPinInput" value="2026" onkeydown="if(event.key==='Enter')authenticateAdminPortal()" placeholder="Enter 4-digit Staff PIN (e.g. 2026)" class="w-full rounded-xl bg-slate-950 border border-slate-700 text-cyan-300 font-mono text-sm px-3.5 py-2.5 tracking-widest focus:outline-none focus:ring-2 focus:ring-cyan-500">
+          <input type="password" id="adminPinInput" value="2026" onkeydown="if(event.key==='Enter')authenticateAdminPortal()" placeholder="Enter Staff PIN (e.g. 2026)" class="w-full rounded-xl bg-slate-950 border border-slate-700 text-cyan-300 font-mono text-sm px-3.5 py-2.5 tracking-widest focus:outline-none focus:ring-2 focus:ring-cyan-500">
           <p id="adminAuthErrorMsg" class="hidden text-[11px] font-bold text-rose-400 mt-1.5">
-            Invalid ONPC Staff PIN. Use authorized PIN (2026 or 1184).
+            Invalid ONPC Staff PIN. Access denied.
           </p>
         </div>
       </div>
@@ -2064,6 +2220,101 @@ jobs:
         <button onclick="authenticateAdminPortal()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-md transition flex items-center gap-1.5">
           <i data-lucide="unlock" class="w-4 h-4"></i>
           <span>Unlock Backend Console</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 11: PATIENT USER AUTHENTICATION (EMAIL & GOOGLE OAUTH) ================= -->
+  <div id="userAuthModal" onclick="if(event.target===this)closeUserAuthModal()" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-blue-900 text-white flex items-center justify-center shadow-2xs">
+            <i data-lucide="user-round" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-900" id="userAuthModalTitle">Espace Patient Pharmacie Bleue Plus</h3>
+            <p class="text-[11px] text-slate-500">Synchronisez vos ordonnances et rappels de santé</p>
+          </div>
+        </div>
+        <button onclick="closeUserAuthModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <!-- Auth Mode Tabs: Connexion (Sign In) vs Créer un compte (Sign Up) -->
+      <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl text-xs font-bold text-center">
+        <button type="button" id="tabAuthSignIn" onclick="switchUserAuthTab('signin')" class="py-2 rounded-lg bg-white text-slate-900 shadow-2xs transition">
+          Se connecter
+        </button>
+        <button type="button" id="tabAuthSignUp" onclick="switchUserAuthTab('signup')" class="py-2 rounded-lg text-slate-500 hover:text-slate-900 transition">
+          Créer un compte
+        </button>
+      </div>
+
+      <!-- One-Click Google OAuth Sign-in Button -->
+      <div>
+        <button type="button" onclick="handleGoogleSignIn()" class="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-xl border border-slate-300 hover:bg-slate-50 hover:border-slate-400 text-slate-700 font-semibold text-xs shadow-2xs transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span id="googleAuthBtnText">Continuer avec Google</span>
+        </button>
+      </div>
+
+      <div class="relative flex items-center justify-center">
+        <div class="border-t border-slate-200 w-full"></div>
+        <span class="bg-white px-2.5 text-[10px] uppercase font-bold text-slate-400 absolute">ou avec e-mail</span>
+      </div>
+
+      <!-- Feedback Banner -->
+      <div id="patientAuthFeedback" class="hidden p-2.5 rounded-xl text-xs font-medium"></div>
+
+      <!-- Email / Password Form -->
+      <form id="patientAuthForm" onsubmit="handlePatientAuthSubmit(event)" class="space-y-3 text-xs">
+        <!-- Name field (Sign Up only) -->
+        <div id="patientAuthNameContainer" class="hidden">
+          <label class="block font-semibold text-slate-700 mb-1">Nom et Prénom *</label>
+          <input type="text" id="patientAuthName" placeholder="ex: Junior Chiabi" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 focus:bg-white focus:ring-2 focus:ring-cyan-500">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Adresse E-mail *</label>
+          <input type="email" id="patientAuthEmail" placeholder="patient@exemple.cm" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 focus:bg-white focus:ring-2 focus:ring-cyan-500">
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-semibold text-slate-700">Mot de passe *</label>
+            <span id="authPwdHint" class="text-[10px] text-slate-400">Min. 6 caractères</span>
+          </div>
+          <div class="relative">
+            <input type="password" id="patientAuthPassword" placeholder="••••••••" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 pr-9 focus:bg-white focus:ring-2 focus:ring-cyan-500">
+            <button type="button" onclick="togglePasswordVisibility('patientAuthPassword')" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Phone / MoMo field (Sign Up only) -->
+        <div id="patientAuthPhoneContainer" class="hidden">
+          <label class="block font-semibold text-slate-700 mb-1">Numéro Téléphone / MTN MoMo / Orange Money (Optionnel)</label>
+          <input type="tel" id="patientAuthPhone" placeholder="6xxxxxxxx" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 focus:bg-white focus:ring-2 focus:ring-cyan-500">
+        </div>
+
+        <button type="submit" id="patientAuthSubmitBtn" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+          <span id="patientAuthSubmitText">Se connecter à mon compte</span>
+        </button>
+      </form>
+
+      <!-- Instant Demo 1-Click Fill Helper -->
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+        <span class="text-slate-500">Test rapide :</span>
+        <button type="button" onclick="quickFillDemoPatientAuth()" class="font-semibold text-cyan-700 hover:text-cyan-800 hover:underline inline-flex items-center gap-1">
+          <i data-lucide="zap" class="w-3 h-3"></i>
+          <span>Remplir Démo (patient@bleueplus.cm)</span>
         </button>
       </div>
     </div>
@@ -2107,10 +2358,6 @@ jobs:
       <div class="flex flex-wrap items-center gap-3 text-slate-400">
         <span>Loi n° 90/035 &amp; SOP-RH-FP-03</span>
         <button onclick="openShortcutsModal()" class="text-slate-500 hover:text-blue-900 underline">Shortcuts (?)</button>
-        <button onclick="openAdminPortalTrigger()" id="footerStaffPortalBtn" class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-blue-950 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-full border border-slate-200 transition" title="Ngousso Pharmacist &amp; Technical Admin Console (#/admin)">
-          <i data-lucide="lock" class="w-3 h-3 text-cyan-700"></i>
-          <span>Staff / Admin Console</span>
-        </button>
       </div>
     </div>
   </footer>
@@ -3024,11 +3271,258 @@ jobs:
       }
     }
 
+    // --- DYNAMIC ONPC PHARMACIST & ADMIN ROSTER ENGINE (Desk 5) ---
+    const ADMIN_ROSTER_KEY = 'pbp_admin_roster';
+    const DEFAULT_ADMIN_ROSTER = [
+      {
+        id: 'admin-1',
+        name: 'Dr. Chiabi Roland',
+        role: 'Pharmacist Assistant',
+        onpc: 'ONPC Section A N° 1184',
+        pin: '1184',
+        isMaster: true,
+        active: true,
+        createdAt: '2026-10-24'
+      },
+      {
+        id: 'admin-2',
+        name: 'Dr. Nguemegne Jean',
+        role: 'Chief Pharmacist',
+        onpc: 'ONPC Section A N° 0492',
+        pin: '0492',
+        isMaster: false,
+        active: true,
+        createdAt: '2026-10-24'
+      },
+      {
+        id: 'admin-3',
+        name: 'Master Technical Admin',
+        role: 'System Administrator',
+        onpc: 'HQ-SYS-01',
+        pin: '2026',
+        isMaster: true,
+        active: true,
+        createdAt: '2026-10-24'
+      }
+    ];
+
+    function getAdminRoster() {
+      try {
+        const raw = localStorage.getItem(ADMIN_ROSTER_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (_) {}
+      return DEFAULT_ADMIN_ROSTER.slice();
+    }
+
+    function saveAdminRoster(roster) {
+      try {
+        localStorage.setItem(ADMIN_ROSTER_KEY, JSON.stringify(roster));
+      } catch (e) {
+        console.error('Failed to save admin roster:', e);
+      }
+      populateAdminRoleSelect();
+      renderAdminStaffTable();
+    }
+
+    function resetAdminRosterToDefault(confirmPrompt = false) {
+      if (confirmPrompt && !confirm('Réinitialiser la liste des collaborateurs autorisés aux paramètres par défaut (Dr. Chiabi Roland, Dr. Nguemegne Jean, Master Admin) ?')) {
+        return;
+      }
+      saveAdminRoster(DEFAULT_ADMIN_ROSTER);
+      showToast('Liste des accès administrateurs réinitialisée avec succès.');
+    }
+
+    function populateAdminRoleSelect() {
+      const roleSel = document.getElementById('adminRoleSelect');
+      if (!roleSel) return;
+      const roster = getAdminRoster().filter(s => s.active);
+      const currentVal = roleSel.value;
+      roleSel.innerHTML = '';
+      roster.forEach(staff => {
+        const opt = document.createElement('option');
+        opt.value = `${staff.name} — ${staff.role} (${staff.onpc})`;
+        opt.textContent = `${staff.name} — ${staff.role} (${staff.onpc})`;
+        opt.dataset.pin = staff.pin;
+        opt.dataset.id = staff.id;
+        roleSel.appendChild(opt);
+      });
+      if (currentVal && Array.from(roleSel.options).some(o => o.value === currentVal)) {
+        roleSel.value = currentVal;
+      }
+    }
+
+    function renderAdminStaffTable() {
+      const tbody = document.getElementById('adminStaffTableBody');
+      if (!tbody) return;
+      const roster = getAdminRoster();
+      tbody.innerHTML = '';
+      roster.forEach(staff => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-semibold text-slate-900">
+            ${staff.name}
+            ${staff.isMaster ? '<span class="ml-1 text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">Master</span>' : ''}
+          </td>
+          <td class="py-2.5 px-3 text-slate-600">${staff.role}</td>
+          <td class="py-2.5 px-3 font-mono text-[11px] text-cyan-800">${staff.onpc || 'N/A'}</td>
+          <td class="py-2.5 px-3 font-mono text-slate-700">
+            <span id="pinDisplay-${staff.id}">••••</span>
+            <button onclick="toggleStaffPinReveal('${staff.id}', '${staff.pin}')" class="ml-1 text-slate-400 hover:text-slate-600" title="Afficher/Masquer PIN">
+              <i data-lucide="eye" class="w-3 h-3 inline"></i>
+            </button>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${staff.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'}">
+              <span class="w-1.5 h-1.5 rounded-full ${staff.active ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
+              ${staff.active ? 'Actif' : 'Désactivé'}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-right space-x-1.5">
+            <button onclick="promptEditStaffPin('${staff.id}')" class="text-[11px] font-semibold text-cyan-700 hover:underline">Modifier PIN</button>
+            ${!staff.isMaster ? `<button onclick="deleteStaffMember('${staff.id}')" class="text-[11px] font-semibold text-rose-600 hover:underline">Supprimer</button>` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function toggleStaffPinReveal(id, pin) {
+      const el = document.getElementById('pinDisplay-' + id);
+      if (!el) return;
+      if (el.textContent === '••••') {
+        el.textContent = pin;
+        el.className = 'text-cyan-700 font-bold';
+      } else {
+        el.textContent = '••••';
+        el.className = 'text-slate-700';
+      }
+    }
+
+    function promptEditStaffPin(id) {
+      const roster = getAdminRoster();
+      const staff = roster.find(s => s.id === id);
+      if (!staff) return;
+      const newPin = prompt(`Entrez le nouveau code PIN (4-8 caractères) pour ${staff.name}:`, staff.pin);
+      if (newPin === null) return;
+      const cleanPin = newPin.trim();
+      if (cleanPin.length < 4 || cleanPin.length > 8) {
+        alert('Le code PIN doit comporter entre 4 et 8 caractères.');
+        return;
+      }
+      staff.pin = cleanPin;
+      saveAdminRoster(roster);
+      showToast(`Code PIN mis à jour pour ${staff.name}.`);
+    }
+
+    function deleteStaffMember(id) {
+      let roster = getAdminRoster();
+      const staff = roster.find(s => s.id === id);
+      if (!staff) return;
+      if (staff.isMaster) {
+        alert('Impossible de supprimer un compte Administrateur Principal.');
+        return;
+      }
+      if (!confirm(`Confirmez-vous la révocation des accès pour ${staff.name} ?`)) return;
+      roster = roster.filter(s => s.id !== id);
+      saveAdminRoster(roster);
+      showToast(`Accès révoqué pour ${staff.name}.`);
+    }
+
+    function handleAddNewStaff(event) {
+      event.preventDefault();
+      const nameInp = document.getElementById('newStaffName');
+      const roleInp = document.getElementById('newStaffRole');
+      const pinInp = document.getElementById('newStaffPin');
+      const onpcInp = document.getElementById('newStaffOnpc');
+
+      const name = nameInp ? nameInp.value.trim() : '';
+      const role = roleInp ? roleInp.value.trim() : 'Pharmacist Assistant';
+      const pin = pinInp ? pinInp.value.trim() : '';
+      const onpc = onpcInp ? onpcInp.value.trim() : '';
+
+      if (!name || pin.length < 4) {
+        showToast('Nom valide et PIN (min 4 chiffres) requis.');
+        return;
+      }
+
+      const roster = getAdminRoster();
+      const newStaff = {
+        id: 'admin-' + Date.now(),
+        name,
+        role,
+        onpc: onpc || 'ONPC Section A',
+        pin,
+        isMaster: false,
+        active: true,
+        createdAt: new Date().toISOString().split('T')[0]
+      };
+      roster.push(newStaff);
+      saveAdminRoster(roster);
+      if (nameInp) nameInp.value = '';
+      if (pinInp) pinInp.value = '';
+      if (onpcInp) onpcInp.value = '';
+      showToast(`Collaborateur ${name} ajouté avec succès au registre ONPC.`);
+    }
+
+    function handleChangeSelfPin(event) {
+      event.preventDefault();
+      const oldPin = (document.getElementById('oldMasterPin') || {}).value || '';
+      const newPin = (document.getElementById('newMasterPin') || {}).value || '';
+      const confirmPin = (document.getElementById('confirmMasterPin') || {}).value || '';
+
+      if (newPin.length < 4 || newPin.length > 8) {
+        showToast('Le nouveau PIN doit comporter 4 à 8 chiffres.');
+        return;
+      }
+      if (newPin !== confirmPin) {
+        showToast('La confirmation du nouveau PIN ne correspond pas.');
+        return;
+      }
+
+      const roster = getAdminRoster();
+      const staff = roster.find(s => s.pin === oldPin.trim());
+      if (!staff) {
+        showToast('Ancien PIN incorrect.');
+        return;
+      }
+
+      staff.pin = newPin.trim();
+      saveAdminRoster(roster);
+      document.getElementById('oldMasterPin').value = '';
+      document.getElementById('newMasterPin').value = '';
+      document.getElementById('confirmMasterPin').value = '';
+      showToast(`Votre code PIN (${staff.name}) a été mis à jour avec succès.`);
+    }
+
+    // --- BRAND LOGO DISCREET TRIPLE-CLICK GESTURE ---
+    let brandLogoClickCount = 0;
+    let brandLogoClickTimer = null;
+
+    function handleBrandLogoClick() {
+      brandLogoClickCount++;
+      if (brandLogoClickCount === 1) {
+        brandLogoClickTimer = setTimeout(() => {
+          if (brandLogoClickCount < 3) {
+            switchTab('dashboard');
+          }
+          brandLogoClickCount = 0;
+        }, 1200);
+      } else if (brandLogoClickCount >= 3) {
+        clearTimeout(brandLogoClickTimer);
+        brandLogoClickCount = 0;
+        openAdminPortalTrigger();
+      }
+    }
+
     // --- DEDICATED PHARMACIST / ADMIN BACKEND ROUTE (#/admin) & AUTH CONTROLLER ---
     let isAdminAuthenticated = false;
     let isAdminPortalActive = false;
     let activeAdminDeskFilter = 'ALL';
-    const AUTHORIZED_ADMIN_PINS = ['2026', '1184', '0492'];
 
     function syncAdminControlsVisibility() {
       const monoStaffBar = document.getElementById('patientMonoStaffControls');
@@ -3056,6 +3550,7 @@ jobs:
         activateAdminBackendView();
         return;
       }
+      populateAdminRoleSelect();
       const m = document.getElementById('adminAuthModal');
       const err = document.getElementById('adminAuthErrorMsg');
       const pinInp = document.getElementById('adminPinInput');
@@ -3087,14 +3582,25 @@ jobs:
         ? overridePin.trim()
         : (pinInp ? pinInp.value.trim() : '');
 
-      if (!AUTHORIZED_ADMIN_PINS.includes(enteredPin)) {
+      const roster = getAdminRoster();
+      const selectedOption = roleSel && roleSel.selectedOptions ? roleSel.selectedOptions[0] : null;
+      const expectedPin = selectedOption && selectedOption.dataset ? selectedOption.dataset.pin : null;
+
+      const isValid = (expectedPin && enteredPin === expectedPin) || roster.some(s => s.active && s.pin === enteredPin);
+
+      if (!isValid) {
         if (err) err.classList.remove('hidden');
         showToast('Access Denied: Invalid ONPC Staff PIN.');
         return false;
       }
 
+      const matchedStaff = (selectedOption && expectedPin && enteredPin === expectedPin)
+        ? roster.find(s => s.id === selectedOption.dataset.id)
+        : roster.find(s => s.active && s.pin === enteredPin) || roster[0];
+
       isAdminAuthenticated = true;
-      const selectedRole = roleSel ? roleSel.value : 'Dr. Chiabi Roland — Assistant (ONPC Section A N° 1184)';
+      const selectedRole = matchedStaff ? `${matchedStaff.name} — ${matchedStaff.role} (${matchedStaff.onpc})` : (roleSel ? roleSel.value : 'Dr. Chiabi Roland');
+
       try {
         sessionStorage.setItem('pbp_admin_auth', '1');
         sessionStorage.setItem('pbp_admin_role', selectedRole);
@@ -3164,7 +3670,7 @@ jobs:
 
     function filterAdminDesk(deskKey) {
       activeAdminDeskFilter = deskKey || 'ALL';
-      const desks = ['ALL', 'dispensing', 'crypto', 'bridge', 'selftest'];
+      const desks = ['ALL', 'dispensing', 'crypto', 'bridge', 'selftest', 'staff'];
       desks.forEach(k => {
         const btn = document.getElementById('adminDeskBtn-' + k);
         if (!btn) return;
@@ -3180,6 +3686,7 @@ jobs:
       const devopsEl = document.getElementById('adminDesk-devops');
       const bridgeEl = document.getElementById('adminDesk-bridge');
       const selftestEl = document.getElementById('adminDesk-selftest');
+      const staffEl = document.getElementById('adminDesk-staff');
 
       if (activeAdminDeskFilter === 'ALL') {
         if (dispensingEl) { dispensingEl.classList.remove('hidden'); dispensingEl.className = 'admin-desk-section lg:col-span-7 bg-white rounded-2xl shadow-sm border-2 border-slate-200 p-5 space-y-4'; }
@@ -3187,27 +3694,44 @@ jobs:
         if (devopsEl) devopsEl.classList.remove('hidden');
         if (bridgeEl) bridgeEl.classList.remove('hidden');
         if (selftestEl) selftestEl.classList.remove('hidden');
+        if (staffEl) staffEl.classList.remove('hidden');
       } else if (activeAdminDeskFilter === 'dispensing') {
         if (dispensingEl) { dispensingEl.classList.remove('hidden'); dispensingEl.className = 'admin-desk-section lg:col-span-12 bg-white rounded-2xl shadow-sm border-2 border-slate-200 p-5 space-y-4'; }
         if (cryptoEl) cryptoEl.classList.add('hidden');
         if (devopsEl) devopsEl.classList.add('hidden');
+        if (bridgeEl) bridgeEl.classList.add('hidden');
+        if (selftestEl) selftestEl.classList.add('hidden');
+        if (staffEl) staffEl.classList.add('hidden');
       } else if (activeAdminDeskFilter === 'crypto') {
         if (dispensingEl) dispensingEl.classList.add('hidden');
         if (cryptoEl) { cryptoEl.classList.remove('hidden'); cryptoEl.className = 'admin-desk-section lg:col-span-12 space-y-5'; }
         if (devopsEl) devopsEl.classList.add('hidden');
+        if (bridgeEl) bridgeEl.classList.add('hidden');
+        if (selftestEl) selftestEl.classList.add('hidden');
+        if (staffEl) staffEl.classList.add('hidden');
       } else if (activeAdminDeskFilter === 'bridge') {
         if (dispensingEl) dispensingEl.classList.add('hidden');
         if (cryptoEl) cryptoEl.classList.add('hidden');
         if (devopsEl) devopsEl.classList.remove('hidden');
         if (bridgeEl) bridgeEl.classList.remove('hidden');
         if (selftestEl) selftestEl.classList.add('hidden');
+        if (staffEl) staffEl.classList.add('hidden');
       } else if (activeAdminDeskFilter === 'selftest') {
         if (dispensingEl) dispensingEl.classList.add('hidden');
         if (cryptoEl) cryptoEl.classList.add('hidden');
         if (devopsEl) devopsEl.classList.remove('hidden');
         if (bridgeEl) bridgeEl.classList.add('hidden');
         if (selftestEl) selftestEl.classList.remove('hidden');
+        if (staffEl) staffEl.classList.add('hidden');
+      } else if (activeAdminDeskFilter === 'staff') {
+        if (dispensingEl) dispensingEl.classList.add('hidden');
+        if (cryptoEl) cryptoEl.classList.add('hidden');
+        if (devopsEl) devopsEl.classList.add('hidden');
+        if (bridgeEl) bridgeEl.classList.add('hidden');
+        if (selftestEl) selftestEl.classList.add('hidden');
+        if (staffEl) staffEl.classList.remove('hidden');
       }
+      renderAdminStaffTable();
       if (window.lucide) lucide.createIcons();
     }
 
@@ -3282,6 +3806,16 @@ jobs:
         showToast('Offline 3G Mode active — All drug monographs, interactions & alarms running from local IndexedDB.');
       });
       if (window.lucide) lucide.createIcons();
+
+      // Dynamic Admin Roster & Patient User Auth Foundation
+      populateAdminRoleSelect();
+      renderAdminStaffTable();
+      syncUserAuthUI();
+      if (window.PBP_SupabaseBridge && window.PBP_SupabaseBridge.auth) {
+        window.PBP_SupabaseBridge.auth.onAuthStateChange(() => {
+          syncUserAuthUI();
+        });
+      }
 
       // Initialize IndexedDB & Service Worker Offline Foundation
       await seedAndHydrateIndexedDB();
@@ -3447,7 +3981,7 @@ jobs:
       { id: 'cmd-test-alarm', title: 'Trigger Test Medication Alarm Chime', subtitle: 'Test C5-E5-G5 clinical triad & notification overlay', shortcut: 'T', icon: 'bell-ring', run: () => { triggerTestAlarm(); } },
       { id: 'cmd-care-plus', title: 'Upgrade / Manage Bleue Plus Care+ VIP (Fapshi MoMo)', subtitle: 'Unlock family profiles & unlimited alarms (2,500 FCFA)', shortcut: 'VIP', icon: 'sparkles', run: () => { openTierModal(); } },
       { id: 'cmd-lang', title: 'Switch Interface Language (EN / FR)', subtitle: 'Toggle bilingual clinical interface', shortcut: 'L', icon: 'languages', run: () => { toggleLanguage(); } },
-      { id: 'cmd-admin-portal', title: '🔒 Ngousso Staff & Technical Admin Console (#/admin)', subtitle: 'SOP-RH-FP-03 Visa Queue, Web Crypto Telemetry & 8-Phase Self-Test', shortcut: 'Ctrl+Shift+A', icon: 'shield-check', run: () => { openAdminPortalTrigger(); } }
+      { id: 'cmd-user-auth', title: '👤 Mon Compte Patient / Se connecter', subtitle: 'Connexion e-mail & Google OAuth, synchronisation sécurisée', shortcut: 'Acc', icon: 'user', run: () => { openUserAuthModal(); } }
     ];
 
     function openCommandPalette(initialQuery) {
@@ -3492,6 +4026,9 @@ jobs:
       closeTierModal();
       closeAdrReportModal();
       if (typeof closeAdminAuthModal === 'function') closeAdminAuthModal();
+      if (typeof closeUserAuthModal === 'function') closeUserAuthModal();
+      const uDrop = document.getElementById('userAccountDropdown');
+      if (uDrop) uDrop.classList.add('hidden');
       if (typeof closePharmacistVisaModal === 'function') closePharmacistVisaModal();
       if (typeof closeMonographModal === 'function') closeMonographModal();
       if (typeof closeTradeMonographDetailModal === 'function') closeTradeMonographDetailModal();
@@ -3634,8 +4171,8 @@ jobs:
         return;
       }
 
-      // 1b. Ctrl+Shift+A opens/toggles the Ngousso Staff & Admin Backend Portal (#/admin)
-      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'a') {
+      // 1b. Secret Admin Portal Trigger (Ctrl+Alt+A - stealth, not advertised in shortcuts)
+      if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'a') {
         event.preventDefault();
         openAdminPortalTrigger();
         return;
@@ -3658,7 +4195,6 @@ jobs:
       else if (key === '3') { event.preventDefault(); switchTab('monographs'); }
       else if (key === '4' || key.toLowerCase() === 'i') { event.preventDefault(); switchTab('interactions'); }
       else if (key === '5') { event.preventDefault(); switchTab('healthtips'); }
-      else if (key === '6') { event.preventDefault(); openAdminPortalTrigger(); }
       else if (key === '/' || key.toLowerCase() === 's') {
         event.preventDefault();
         switchTab('monographs');
@@ -3681,6 +4217,209 @@ jobs:
         openShortcutsModal();
       }
     });
+
+
+    // --- PATIENT USER AUTHENTICATION CONTROLLER ---
+    let currentUserAuthTab = 'signin';
+
+    function openUserAuthModal(tab = 'signin') {
+      const m = document.getElementById('userAuthModal');
+      if (!m) return;
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+      switchUserAuthTab(tab);
+      clearAuthFeedback();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeUserAuthModal() {
+      const m = document.getElementById('userAuthModal');
+      if (!m) return;
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function switchUserAuthTab(tab) {
+      currentUserAuthTab = tab;
+      const tabSignIn = document.getElementById('tabAuthSignIn');
+      const tabSignUp = document.getElementById('tabAuthSignUp');
+      const nameCont = document.getElementById('patientAuthNameContainer');
+      const phoneCont = document.getElementById('patientAuthPhoneContainer');
+      const submitText = document.getElementById('patientAuthSubmitText');
+
+      if (tab === 'signup') {
+        if (tabSignUp) tabSignUp.className = 'py-2 rounded-lg bg-white text-slate-900 shadow-2xs transition';
+        if (tabSignIn) tabSignIn.className = 'py-2 rounded-lg text-slate-500 hover:text-slate-900 transition';
+        if (nameCont) nameCont.classList.remove('hidden');
+        if (phoneCont) phoneCont.classList.remove('hidden');
+        if (submitText) submitText.textContent = 'Créer mon compte Pharmacie Bleue Plus';
+      } else {
+        if (tabSignIn) tabSignIn.className = 'py-2 rounded-lg bg-white text-slate-900 shadow-2xs transition';
+        if (tabSignUp) tabSignUp.className = 'py-2 rounded-lg text-slate-500 hover:text-slate-900 transition';
+        if (nameCont) nameCont.classList.add('hidden');
+        if (phoneCont) phoneCont.classList.add('hidden');
+        if (submitText) submitText.textContent = 'Se connecter à mon compte';
+      }
+    }
+
+    function setAuthFeedback(msg, isError = false) {
+      const fb = document.getElementById('patientAuthFeedback');
+      if (!fb) return;
+      fb.classList.remove('hidden', 'bg-rose-50', 'text-rose-700', 'border-rose-200', 'bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+      fb.classList.add('border');
+      if (isError) {
+        fb.classList.add('bg-rose-50', 'text-rose-700', 'border-rose-200');
+      } else {
+        fb.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+      }
+      fb.textContent = msg;
+    }
+
+    function clearAuthFeedback() {
+      const fb = document.getElementById('patientAuthFeedback');
+      if (fb) fb.classList.add('hidden');
+    }
+
+    function togglePasswordVisibility(inputId) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    function quickFillDemoPatientAuth() {
+      const email = document.getElementById('patientAuthEmail');
+      const pwd = document.getElementById('patientAuthPassword');
+      const name = document.getElementById('patientAuthName');
+      if (email) email.value = 'patient.junior@bleueplus.cm';
+      if (pwd) pwd.value = 'BleuePlus2026!';
+      if (name) name.value = 'Junior Chiabi';
+      showToast('Identifiants de démonstration remplis.');
+    }
+
+    async function handlePatientAuthSubmit(event) {
+      event.preventDefault();
+      const emailInp = document.getElementById('patientAuthEmail');
+      const pwdInp = document.getElementById('patientAuthPassword');
+      const nameInp = document.getElementById('patientAuthName');
+      const phoneInp = document.getElementById('patientAuthPhone');
+
+      const email = emailInp ? emailInp.value.trim() : '';
+      const password = pwdInp ? pwdInp.value : '';
+      const fullName = nameInp ? nameInp.value.trim() : '';
+      const phone = phoneInp ? phoneInp.value.trim() : '';
+
+      clearAuthFeedback();
+
+      try {
+        if (!window.PBP_SupabaseBridge || !window.PBP_SupabaseBridge.auth) {
+          throw new Error('Module d\'authentification indisponible.');
+        }
+
+        if (currentUserAuthTab === 'signup') {
+          setAuthFeedback('Création du compte en cours...', false);
+          const res = await window.PBP_SupabaseBridge.auth.signUp(email, password, { fullName, phone });
+          setAuthFeedback(`Bienvenue, ${res.user.user_metadata.full_name || email} ! Compte créé.`, false);
+          showToast(`Compte patient créé : ${email}`);
+          setTimeout(() => {
+            closeUserAuthModal();
+            syncUserAuthUI();
+          }, 600);
+        } else {
+          setAuthFeedback('Connexion en cours...', false);
+          const res = await window.PBP_SupabaseBridge.auth.signInWithEmail(email, password);
+          setAuthFeedback(`Ravi de vous revoir, ${res.user.user_metadata.full_name || email} !`, false);
+          showToast(`Connecté : ${email}`);
+          setTimeout(() => {
+            closeUserAuthModal();
+            syncUserAuthUI();
+          }, 600);
+        }
+      } catch (err) {
+        setAuthFeedback(err.message || 'Une erreur est survenue lors de l\'authentification.', true);
+      }
+    }
+
+    async function handleGoogleSignIn() {
+      clearAuthFeedback();
+      try {
+        if (!window.PBP_SupabaseBridge || !window.PBP_SupabaseBridge.auth) {
+          throw new Error('Module d\'authentification indisponible.');
+        }
+        setAuthFeedback('Connexion avec Google en cours...', false);
+        const res = await window.PBP_SupabaseBridge.auth.signInWithGoogle();
+        if (res && res.user) {
+          setAuthFeedback(`Connecté avec Google : ${res.user.email}`, false);
+          showToast(`Connecté avec Google (${res.user.email})`);
+          setTimeout(() => {
+            closeUserAuthModal();
+            syncUserAuthUI();
+          }, 600);
+        }
+      } catch (err) {
+        setAuthFeedback(err.message || 'Échec de la connexion Google.', true);
+      }
+    }
+
+    async function handleUserSignOut() {
+      try {
+        if (window.PBP_SupabaseBridge && window.PBP_SupabaseBridge.auth) {
+          await window.PBP_SupabaseBridge.auth.signOut();
+        }
+      } catch (_) {}
+      const uDrop = document.getElementById('userAccountDropdown');
+      if (uDrop) uDrop.classList.add('hidden');
+      syncUserAuthUI();
+      showToast('Vous avez été déconnecté avec succès.');
+    }
+
+    function handleUserAuthBtnClick() {
+      const user = window.PBP_SupabaseBridge && window.PBP_SupabaseBridge.auth
+        ? window.PBP_SupabaseBridge.auth.getUser()
+        : null;
+
+      if (user) {
+        toggleUserAccountDropdown();
+      } else {
+        openUserAuthModal('signin');
+      }
+    }
+
+    function toggleUserAccountDropdown() {
+      const uDrop = document.getElementById('userAccountDropdown');
+      if (!uDrop) return;
+      uDrop.classList.toggle('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function syncUserAuthUI() {
+      const user = window.PBP_SupabaseBridge && window.PBP_SupabaseBridge.auth
+        ? window.PBP_SupabaseBridge.auth.getUser()
+        : null;
+
+      const labelEl = document.getElementById('userAuthBtnLabel');
+      const chevEl = document.getElementById('userAuthChevron');
+      const btn = document.getElementById('userAuthBtn');
+      const menuName = document.getElementById('userMenuName');
+      const menuEmail = document.getElementById('userMenuEmail');
+      const menuTier = document.getElementById('userMenuTierBadge');
+
+      if (user) {
+        const name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
+        if (labelEl) labelEl.textContent = name;
+        if (chevEl) chevEl.classList.remove('hidden');
+        if (btn) btn.className = 'inline-flex items-center gap-1.5 bg-cyan-50 hover:bg-cyan-100 text-cyan-950 px-2.5 py-1.5 rounded-full border border-cyan-300 text-xs font-semibold shadow-2xs transition';
+        if (menuName) menuName.textContent = name;
+        if (menuEmail) menuEmail.textContent = user.email;
+        if (menuTier) menuTier.textContent = currentTier === 'PRO' ? 'Care+ VIP ★' : 'Free Tier';
+      } else {
+        if (labelEl) labelEl.textContent = 'Connexion';
+        if (chevEl) chevEl.classList.add('hidden');
+        if (btn) btn.className = 'inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 px-2.5 py-1.5 rounded-full border border-blue-200/90 text-xs font-semibold shadow-2xs transition';
+        const uDrop = document.getElementById('userAccountDropdown');
+        if (uDrop) uDrop.classList.add('hidden');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
 
     // --- LIVE CLOCK & WEB AUDIO + OFFLINE NOTIFICATION ALARM ENGINE ---
     function updateClock() {
