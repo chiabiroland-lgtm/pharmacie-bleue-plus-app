@@ -24,3 +24,12 @@ scratch/
 .env.*.local
 
 supabase/.temp/
+
+# Android & Capacitor build outputs
+www/
+android/.gradle/
+android/app/build/
+android/build/
+*.apk
+*.aab
+*.jks

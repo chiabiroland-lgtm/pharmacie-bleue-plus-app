@@ -13,11 +13,16 @@
   const OUTBOX_STORE = 'supabaseOutbox';
   const VAULT_STORE = 'encryptedVault';
 
+  const DEFAULT_SUPABASE_PROJECT = {
+    url: 'https://efjjilmwpfmostoxhitp.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmamppbG13cGZtb3N0b3hoaXRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5OTg5MjksImV4cCI6MjEwODU3NDkyOX0.JtrkHPLJAaMrm1zZ0he_2InsvCXf2HL7czJeyJSmCo0'
+  };
+
   // In-memory state
   let config = {
-    url: '',
-    anonKey: '',
-    mode: 'LOCAL_MOCK_VAULT',
+    url: DEFAULT_SUPABASE_PROJECT.url,
+    anonKey: DEFAULT_SUPABASE_PROJECT.anonKey,
+    mode: 'LIVE_SUPABASE_REST_BRIDGE',
     lastSyncAt: null,
     status: 'INITIALIZING'
   };
@@ -54,10 +59,13 @@
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object') {
-          config.url = (parsed.url || '').trim();
-          config.anonKey = (parsed.anonKey || '').trim();
+          config.url = (parsed.url || DEFAULT_SUPABASE_PROJECT.url).trim();
+          config.anonKey = (parsed.anonKey || DEFAULT_SUPABASE_PROJECT.anonKey).trim();
           config.lastSyncAt = parsed.lastSyncAt || null;
         }
+      } else {
+        config.url = DEFAULT_SUPABASE_PROJECT.url;
+        config.anonKey = DEFAULT_SUPABASE_PROJECT.anonKey;
       }
     } catch (e) {
       console.warn('Could not read pbp_supabase_config from localStorage:', e);

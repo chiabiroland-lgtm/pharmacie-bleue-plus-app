@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Télécharger l'Application Android — Pharmacie Bleue Plus Ngousso</title>
+  <meta name="description" content="Installez l'application native Android Pharmacie Bleue Plus sur votre smartphone. Alarmes de prise exactes, scan d'ordonnance chiffré et catalogue VINDATA hors-ligne.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230284C7'/><path d='M35 50h30M50 35v30' stroke='white' stroke-width='14' stroke-linecap='round'/></svg>">
+  <meta name="theme-color" content="#0F172A">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              900: '#0c4a6e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-full flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+
+  <!-- Header Banner -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-30 px-4 py-3 sm:px-6">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-sky-500/20 font-bold text-lg">
+          +
+        </div>
+        <div>
+          <h1 class="text-base font-semibold tracking-tight text-white flex items-center gap-1.5">
+            Pharmacie Bleue Plus
+            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-mono font-medium">Android Native</span>
+          </h1>
+          <p class="text-xs text-slate-400">Ngousso, Yaoundé • Compagnon de Santé & Observance</p>
+        </div>
+      </div>
+      <a href="index.html" class="text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60">
+        <span>Version Web</span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Hero & Download Section -->
+  <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-8 sm:py-12 flex flex-col items-center text-center">
+
+    <!-- Badge -->
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-medium mb-6">
+      <svg class="w-4 h-4 text-sky-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993s-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993s-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.411 13.8559 8.134 12 8.134c-1.8559 0-3.5902.277-5.1368.8157L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.152 5676l1.9972 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
+      <span>Application Officielle certifiée • Version 1.0.0 (Build Android)</span>
+    </div>
+
+    <!-- Title & Clinical Value Prop -->
+    <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white max-w-2xl leading-tight">
+      Vos alarmes médicales exactes, <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300">même téléphone verrouillé</span>.
+    </h2>
+    <p class="mt-4 text-sm sm:text-base text-slate-300 max-w-xl leading-relaxed">
+      Spécialement conçue pour les patients de la <strong>Pharmacie Bleue Plus à Ngousso</strong>. Fonctionne à 100% hors-ligne en 3G/sans réseau et ne consomme aucun crédit d'arrière-plan.
+    </p>
+
+    <!-- Download Card -->
+    <div class="mt-8 w-full max-w-md bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-2xl backdrop-blur-sm">
+      
+      <!-- Primary Download Button -->
+      <a id="apkDownloadBtn" href="https://github.com/chiabiroland-lgtm/pharmacie-bleue-plus-app/releases/latest/download/PharmacieBleuePlus-v1.0-debug.apk" class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-sky-500 to-teal-500 hover:from-sky-400 hover:to-teal-400 text-slate-950 font-bold px-6 py-4 rounded-xl shadow-lg shadow-sky-500/25 transition transform active:scale-[0.98]">
+        <svg class="w-6 h-6 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <div class="text-left">
+          <div class="text-sm font-black leading-tight">Télécharger l'APK Direct</div>
+          <div class="text-[11px] font-medium text-slate-900/80">Installation gratuite • ~6 Mo • Android 7.0 à 15</div>
+        </div>
+      </a>
+
+      <!-- Secondary GitHub Releases Button -->
+      <div class="mt-3 flex items-center justify-between text-xs text-slate-400 px-1">
+        <span>Hébergé sur GitHub Releases</span>
+        <a href="https://github.com/chiabiroland-lgtm/pharmacie-bleue-plus-app/releases" target="_blank" rel="noopener" class="text-sky-400 hover:underline flex items-center gap-1">
+          <span>Voir toutes les versions</span>
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+      </div>
+
+      <!-- Live Features Highlights -->
+      <div class="mt-6 pt-5 border-t border-slate-700/60 grid grid-cols-2 gap-3 text-left">
+        <div class="flex items-start gap-2.5">
+          <div class="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">✓</div>
+          <div>
+            <div class="text-xs font-semibold text-slate-200">Alarmes Exactes</div>
+            <div class="text-[11px] text-slate-400">Sonne même écran éteint</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <div class="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">✓</div>
+          <div>
+            <div class="text-xs font-semibold text-slate-200">Appareil Photo Rx</div>
+            <div class="text-[11px] text-slate-400">Compression 300 Ko & Chiffrement</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <div class="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">✓</div>
+          <div>
+            <div class="text-xs font-semibold text-slate-200">8 271 Médicaments</div>
+            <div class="text-[11px] text-slate-400">Prix VINDATA officiels Yaoundé</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <div class="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">✓</div>
+          <div>
+            <div class="text-xs font-semibold text-slate-200">100% Hors-Ligne</div>
+            <div class="text-[11px] text-slate-400">Aucun crédit data requis</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Installation 3-Step Guide -->
+    <div class="mt-12 w-full max-w-2xl text-left">
+      <h3 class="text-lg font-bold text-white mb-4 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
+        <span class="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-400 text-xs flex items-center justify-center font-bold">i</span>
+        Guide d'installation simple (en 3 étapes)
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        
+        <div class="bg-slate-800/50 border border-slate-700/60 rounded-xl p-4">
+          <div class="w-7 h-7 rounded-full bg-sky-500/20 text-sky-400 font-bold text-sm flex items-center justify-center mb-2.5">1</div>
+          <div class="text-xs font-semibold text-slate-200">Téléchargez l'APK</div>
+          <p class="text-[11px] text-slate-400 mt-1">Cliquez sur le bouton ci-dessus. Si Android affiche <em>« Ce fichier peut être nocif »</em>, cliquez sur <strong>Télécharger quand même</strong>.</p>
+        </div>
+
+        <div class="bg-slate-800/50 border border-slate-700/60 rounded-xl p-4">
+          <div class="w-7 h-7 rounded-full bg-sky-500/20 text-sky-400 font-bold text-sm flex items-center justify-center mb-2.5">2</div>
+          <div class="text-xs font-semibold text-slate-200">Ouvrez le fichier</div>
+          <p class="text-[11px] text-slate-400 mt-1">Appuyez sur la notification de fin de téléchargement ou retrouvez <code>PharmacieBleuePlus.apk</code> dans vos Téléchargements.</p>
+        </div>
+
+        <div class="bg-slate-800/50 border border-slate-700/60 rounded-xl p-4">
+          <div class="w-7 h-7 rounded-full bg-sky-500/20 text-sky-400 font-bold text-sm flex items-center justify-center mb-2.5">3</div>
+          <div class="text-xs font-semibold text-slate-200">Autorisez & Lancez</div>
+          <p class="text-[11px] text-slate-400 mt-1">Activez <em>« Installer des applications inconnues »</em> pour votre navigateur si demandé, puis cliquez sur <strong>Installer</strong>.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Pharmacy Ngousso Contact / WhatsApp Assistance -->
+    <div class="mt-10 max-w-md w-full bg-gradient-to-r from-emerald-950/40 to-slate-800/60 border border-emerald-500/20 rounded-xl p-4 flex items-center justify-between text-left">
+      <div>
+        <div class="text-xs font-semibold text-emerald-300">Besoin d'aide pour l'installation ?</div>
+        <div class="text-[11px] text-slate-400">Le comptoir de garde à Ngousso est à votre écoute.</div>
+      </div>
+      <a href="https://wa.me/237699000000?text=Bonjour%20Pharmacie%20Bleue%20Plus,%20j'ai%20besoin%20d'aide%20pour%20installer%20l'application%20Android." target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-lg transition shrink-0">
+        <span>WhatsApp</span>
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.584 1.961.94 2.796.94 3.179 0 5.767-2.587 5.767-5.766.001-3.187-2.575-5.77-5.767-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.299.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.353.101.173.45 0.742.965 1.201.662.591 1.221.774 1.394.86.173.086.275.072.376-.043.101-.116.433-.506.549-.679.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.203c.043.072.043.419-.101.824z"/></svg>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 py-6 px-4 text-center text-xs text-slate-500">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div>Pharmacie Bleue Plus © 2026 • Yaoundé, Cameroun</div>
+      <div class="flex items-center gap-4 text-slate-400">
+        <a href="index.html" class="hover:underline">Accueil Patient</a>
+        <span>•</span>
+        <a href="admin.html" class="hover:underline">Espace Officine</a>
+        <span>•</span>
+        <a href="https://github.com/chiabiroland-lgtm/pharmacie-bleue-plus-app" target="_blank" rel="noopener" class="hover:underline">Code Source</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
