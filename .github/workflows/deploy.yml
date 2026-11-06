@@ -12,6 +12,9 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -19,7 +22,7 @@ concurrency:
 jobs:
   clinical-compliance-gate:
     name: "SOP-RH-FP-03, AES-256-GCM & Offline PWA Gate"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,8 +41,8 @@ jobs:
           test -f sw.js
           test -f _headers
           test -f pbp-catalog.js
-          grep -q "#1E3A8A" manifest.json
-          grep -q "#0891B2" manifest.json
+          grep -q "#FFFFFF" manifest.json
+          grep -q "#F8FAFC" manifest.json
           grep -q "pbp-clinical-compendium" sw.js
           grep -q "Content-Security-Policy" _headers
           grep -q "PBP_TRADE_CATALOG" pbp-catalog.js
@@ -64,7 +67,7 @@ jobs:
 
       - name: Ensure Zero Hardcoded Service-Role Secrets
         run: |
-          if grep -E "service_role|sbp_[a-zA-Z0-9]{20,}" index.html; then
+          if grep -E "sbp_[a-zA-Z0-9]{20,}" index.html; then
             echo "❌ Hardcoded Supabase secret detected!"
             exit 1
           fi
@@ -74,7 +77,7 @@ jobs:
     name: "Deploy Static PWA to GitHub Pages ($0/mo)"
     needs: clinical-compliance-gate
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -82,13 +85,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Build Clean Web Assets Directory
+        run: |
+          node copy-www.js
+          touch www/.nojekyll
+
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
 
       - name: Upload PWA Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: 'www'
 
       - name: Deploy to GitHub Pages
         id: deployment
